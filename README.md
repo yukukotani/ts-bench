@@ -4,10 +4,10 @@
 
 ## Leaderboard
 
-| Rank | Agent | Model | Success Rate | Solved | Avg Time per Correct |
-|:----:|:------|:------|:--------------:|:------:|:--------------------:|
-| 🏆 1 | codex | gpt-5 | **88.0%** | 22/25 | **91.7s** |
-| 2 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | **206.1s** |
+| Rank | Agent | Model | Success Rate | Solved | Avg Time per Correct | Result |
+|:----:|:------|:------|:--------------:|:------:|:--------------------:|:---:|
+| 🏆 1 | codex | gpt-5 | **88.0%** | 22/25 | **91.7s** | [#13](https://github.com/laiso/ts-bench/actions/runs/17344734992) |
+| 2 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | **206.1s** | [#12](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
 
 **TBD**
 
