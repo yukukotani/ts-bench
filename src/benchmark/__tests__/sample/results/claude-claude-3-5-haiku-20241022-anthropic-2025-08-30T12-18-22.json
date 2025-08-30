@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "agent": "claude",
+    "model": "claude-3-5-haiku-20241022",
+    "provider": "anthropic",
+    "version": "1.0.0",
+    "timestamp": "2025-08-30T12:18:22.252Z",
+    "exerciseCount": 1,
+    "benchmarkVersion": "1.0.0",
+    "generatedBy": "ai-coding-benchmark"
+  },
+  "summary": {
+    "successRate": 100,
+    "totalDuration": 80720,
+    "avgDuration": 80720,
+    "successCount": 1,
+    "totalCount": 1,
+    "agentSuccessCount": 1,
+    "testSuccessCount": 1,
+    "testFailedCount": 0
+  },
+  "results": [
+    {
+      "exercise": "accumulate",
+      "agentSuccess": true,
+      "testSuccess": true,
+      "overallSuccess": true,
+      "agentDuration": 72090,
+      "testDuration": 8477,
+      "totalDuration": 80720
+    }
+  ]
+}

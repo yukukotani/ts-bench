@@ -1,0 +1,3 @@
+[submodule "exercism-typescript"]
+	path = exercism-typescript
+	url = https://github.com/laiso/exercism-typescript

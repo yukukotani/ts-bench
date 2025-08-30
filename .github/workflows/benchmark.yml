@@ -1,0 +1,266 @@
+name: Manual Benchmark Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Agent to run
+        required: true
+        default: claude
+        type: choice
+        options:
+          - claude
+          - codex
+          - gemini
+          - opencode
+          - goose
+          - qwen
+          - aider
+      model:
+        description: Model to use (e.g., claude-sonnet-4-20250514)
+        required: true
+        default: claude-3-5-haiku-20241022
+      provider:
+        description: Provider (openai, anthropic, google, openrouter, dashscope)
+        required: true
+        default: anthropic
+        type: choice
+        options:
+          - openai
+          - anthropic
+          - google
+          - openrouter
+          - dashscope
+      use_docker:
+        description: Run agent in Docker
+        required: false
+        default: false
+        type: boolean
+      exercise:
+        description: "Exercise selection: number (first N), comma list, or name"
+        required: false
+        default: ""
+      save_result:
+        description: Save result JSON
+        required: false
+        default: true
+        type: boolean
+      result_dir:
+        description: Directory to save result JSON
+        required: false
+        default: ./results
+      verbose:
+        description: Verbose console output
+        required: false
+        default: true
+        type: boolean
+
+run-name: 'Benchmark for ${{ github.event.inputs.agent }} using ${{ github.event.inputs.model }}'
+
+jobs:
+  run-benchmark:
+    name: Run Benchmark
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node (for corepack/yarn)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install agent CLI (local mode)
+        if: ${{ github.event.inputs.use_docker == 'false' }}
+        run: |
+          set -euo pipefail
+          agent="${{ github.event.inputs.agent }}"
+          echo "Installing CLI for agent: $agent"
+          case "$agent" in
+            claude)
+              npm install -g @anthropic-ai/claude-code
+              mkdir -p "$HOME/.claude"
+              ;;
+            codex)
+              npm install -g @openai/codex
+              echo "CODEX_RUST=1" >> "$GITHUB_ENV"
+              # Provide default AGENTS.md (optional)
+              echo "Solve this TypeScript exercise. Read the test file to understand requirements and implement the solution." > AGENTS.md
+              ;;
+            goose)
+              CONFIGURE=false curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | bash
+              echo "HOME=$HOME" >> "$GITHUB_ENV"
+              echo "PATH=$HOME/.local/bin:$PATH" >> "$GITHUB_ENV"
+              ;;
+            aider)
+              curl -LsSf https://aider.chat/install.sh | sh
+              echo "PATH=$HOME/.local/bin:$PATH" >> "$GITHUB_ENV"
+              ;;
+            gemini)
+              npm install -g @google/gemini-cli
+              ;;
+            qwen)
+              npm install -g @qwen-code/qwen-code
+              ;;
+            opencode)
+              npm install -g opencode-ai
+              ;;
+            *)
+              echo "No installer defined for agent: $agent" >&2
+              ;;
+          esac
+
+      - name: Check local agent availability
+        if: ${{ github.event.inputs.use_docker == 'false' }}
+        run: |
+          set -euo pipefail
+          agent="${{ github.event.inputs.agent }}"
+          ok=0
+          case "$agent" in
+            claude)   cmd=claude ;;
+            goose)    cmd=goose ;;
+            aider)    cmd=aider ;;
+            codex)    cmd="codex --version" ;;
+            gemini)   cmd=gemini ;;
+            opencode) cmd=opencode ;;
+            qwen)     cmd=qwen ;;
+            *)        cmd="" ;;
+          esac
+
+          if [ -z "$cmd" ]; then
+            echo "Unknown agent: $agent" >&2
+            exit 1
+          fi
+
+          if echo "$cmd" | grep -q '^npx'; then
+            # npx-based command
+            if $cmd >/dev/null 2>&1; then ok=1; fi
+          else
+            if command -v "$cmd" >/dev/null 2>&1; then ok=1; fi
+          fi
+
+          if [ "$ok" -ne 1 ]; then
+            echo "::warning::Agent CLI '$agent' not found for local mode. Install it in this workflow or set 'use_docker' to true." >&2
+          else
+            echo "Agent CLI '$agent' found."
+          fi
+
+      - name: Run benchmark
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${{ github.event.inputs.result_dir }}"
+
+          CMD=(bun src/index.ts \
+            --agent "${{ github.event.inputs.agent }}" \
+            --model "${{ github.event.inputs.model }}" \
+            --provider "${{ github.event.inputs.provider }}")
+
+          # Docker toggle
+          if [ "${{ github.event.inputs.use_docker }}" = "true" ]; then
+            CMD+=(--docker)
+          fi
+
+          # Save result JSON if requested
+          if [ "${{ github.event.inputs.save_result }}" = "true" ]; then
+            CMD+=(--save-result --result-dir "${{ github.event.inputs.result_dir }}")
+          fi
+
+          # Exercise selection (number, comma list, or name)
+          if [ -n "${{ github.event.inputs.exercise }}" ]; then
+            CMD+=(--exercise "${{ github.event.inputs.exercise }}")
+          fi
+
+          # Verbose output
+          if [ "${{ github.event.inputs.verbose }}" = "true" ]; then
+            CMD+=(--verbose)
+          fi
+
+          echo "Running: ${CMD[*]}"
+          "${CMD[@]}" | tee benchmark-summary.txt
+
+      - name: Write Job Summary
+        if: always()
+        run: |
+          {
+            echo "## Benchmark Results"
+            echo
+            echo "- Agent: ${{ github.event.inputs.agent }}"
+            echo "- Model: ${{ github.event.inputs.model }}"
+            echo "- Provider: ${{ github.event.inputs.provider }}"
+
+            # If latest.json exists, print a compact summary
+            if [ -f "${{ github.event.inputs.result_dir }}/latest.json" ]; then
+              if command -v jq >/dev/null 2>&1; then
+                TOTAL=$(jq -r '.summary.totalCount' "${{ github.event.inputs.result_dir }}/latest.json" 2>/dev/null || echo "")
+                SUCCESS=$(jq -r '.summary.successCount' "${{ github.event.inputs.result_dir }}/latest.json" 2>/dev/null || echo "")
+                RATE=$(jq -r '.summary.successRate' "${{ github.event.inputs.result_dir }}/latest.json" 2>/dev/null || echo "")
+                TDUR_MS=$(jq -r '.summary.totalDuration' "${{ github.event.inputs.result_dir }}/latest.json" 2>/dev/null || echo "")
+                ADUR_MS=$(jq -r '.summary.avgDuration' "${{ github.event.inputs.result_dir }}/latest.json" 2>/dev/null || echo "")
+                # Pretty seconds (1 decimal if needed)
+                if [ -n "$TDUR_MS" ] && [ "$TDUR_MS" != "null" ]; then
+                  TDUR_S=$(jq -nr --argjson ms "$TDUR_MS" '((($ms/1000)*10)|round)/10')
+                fi
+                if [ -n "$ADUR_MS" ] && [ "$ADUR_MS" != "null" ]; then
+                  ADUR_S=$(jq -nr --argjson ms "$ADUR_MS" '((($ms/1000)*10)|round)/10')
+                fi
+                echo
+                echo "### Summary"
+                echo "- Total: ${TOTAL:-n/a}"
+                echo "- Success: ${SUCCESS:-n/a}"
+                echo "- Success Rate: ${RATE:-n/a}%"
+                if [ -n "${TDUR_S:-}" ]; then
+                  echo "- Duration: ${TDUR_S}s"
+                fi
+                if [ -n "${ADUR_S:-}" ]; then
+                  echo "- Avg: ${ADUR_S}s"
+                fi
+
+                echo
+                echo "### Problem Results"
+                # List each problem with link + mark + time
+                jq -r '
+                  .results[] |
+                  "- [" + .exercise + "](https://exercism.org/tracks/typescript/exercises/" + .exercise + ") "
+                  + (if .overallSuccess then "✅" else "❌" end)
+                  + " "
+                  + (((.totalDuration/1000*10)|round)/10|tostring) + "s"
+                ' "${{ github.event.inputs.result_dir }}/latest.json" || true
+              fi
+            fi
+            echo
+            echo "### Docs"
+            echo "- Methodology: [docs/METHODOLOGY.md](https://github.com/laiso/ts-bench/blob/main/docs/METHODOLOGY.md)"
+            echo "- README: [README.md](https://github.com/laiso/ts-bench/)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts (results + console)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ github.event.inputs.agent }}-${{ github.event.inputs.model }}
+          path: |
+            ${{ github.event.inputs.result_dir }}/
+            benchmark-summary.txt
+          if-no-files-found: warn
+          retention-days: 14
