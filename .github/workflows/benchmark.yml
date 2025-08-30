@@ -61,6 +61,8 @@ jobs:
   run-benchmark:
     name: Run Benchmark
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout

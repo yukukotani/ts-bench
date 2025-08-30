@@ -33,6 +33,15 @@ export class ConsoleLogger implements Logger {
         const command = sanitized.join(" ");
         return command.length > 1024 ? command.slice(0, 1024) + "..." : command;
     }
+    
+    private redact(text: string): string {
+        if (!text) return text;
+        let out = text;
+        out = out.replace(/Bearer\s+[A-Za-z0-9._-]+/g, 'Bearer ***');
+        out = out.replace(/sk-[A-Za-z0-9]{10,}/g, 'sk-***');
+        out = out.replace(/([A-Z_]+_(API_KEY|TOKEN|SECRET))=([^\s]+)/g, '$1=***');
+        return out;
+    }
 
     logAgentCommand(args: string[]): void {
         const sanitizedCommand = this.sanitizeCommand(args);
@@ -47,7 +56,8 @@ export class ConsoleLogger implements Logger {
         console.log(`🤖 ${exercise} - Agent Success (${formatDuration(duration)})`);
         if (verbose && result) {
             if (result.stdout) {
-                console.log(`  Agent Output Preview: ${result.stdout.slice(0, 300)}${result.stdout.length > 300 ? '...' : ''}`);
+                const redacted = this.redact(result.stdout);
+                console.log(`  Agent Output Preview: ${redacted.slice(0, 300)}${redacted.length > 300 ? '...' : ''}`);
             }
         }
     }
@@ -56,7 +66,8 @@ export class ConsoleLogger implements Logger {
         console.log(`🤖 ${exercise} - Agent Failed (${formatDuration(duration)})`);
         if (verbose) {
             if (result.stdout) console.log(`  Agent STDOUT: ${result.stdout.slice(0, 500)}...`);
-            if (result.stderr) console.log(`  Agent STDERR: ${result.stderr.slice(0, 500)}...`);
+            if (result.stdout) console.log(`  Agent STDOUT: ${this.redact(result.stdout).slice(0, 500)}...`);
+            if (result.stderr) console.log(`  Agent STDERR: ${this.redact(result.stderr).slice(0, 500)}...`);
         }
     }
 
@@ -72,7 +83,8 @@ export class ConsoleLogger implements Logger {
         console.log(`🧪 ${exercise} - Test Failed (${formatDuration(duration)})`);
         if (verbose) {
             if (result.stdout) console.log(`  Test STDOUT: ${result.stdout.slice(0, 500)}...`);
-            if (result.stderr) console.log(`  Test STDERR: ${result.stderr.slice(0, 500)}...`);
+            if (result.stdout) console.log(`  Test STDOUT: ${this.redact(result.stdout).slice(0, 500)}...`);
+            if (result.stderr) console.log(`  Test STDERR: ${this.redact(result.stderr).slice(0, 500)}...`);
         }
     }
 

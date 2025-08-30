@@ -8,15 +8,18 @@ describe('ClaudeAgentBuilder', () => {
     };
 
     it('should build correct command for Claude agent', async () => {
-        const builder = new ClaudeAgentBuilder(config);
-        const args = await builder.build('/path/to/exercise', 'Test instructions');
+    const prev = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = 'test-key';
+    const builder = new ClaudeAgentBuilder(config);
+    const args = await builder.build('/path/to/exercise', 'Test instructions');
 
         expect(args).toContain('docker');
         expect(args).toContain('run');
-        expect(args).toContain('-e');
-        expect(args).toContain('ANTHROPIC_API_KEY');
+    expect(args).toContain('-e');
+    expect(args.some(a => a.startsWith('ANTHROPIC_API_KEY='))).toBeTrue();
         expect(args).toContain('test-container');
         expect(args.join(' ')).toContain('claude-3-sonnet');
+        process.env.ANTHROPIC_API_KEY = prev;
     });
 
     it('should escape shell arguments properly', async () => {

@@ -4,6 +4,10 @@ export function escapeShellArg(str: string): string {
     return str.replace(/'/g, "'\"'\"'");
 }
 
+export function escapeForDoubleQuotes(str: string): string {
+    return str.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+}
+
 export interface ExecuteOptions {
     cwd?: string;
     env?: Record<string, string>;

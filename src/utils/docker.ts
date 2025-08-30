@@ -24,12 +24,11 @@ export function createWorkspaceArgs(options: DockerWorkspaceOptions): string[] {
  * Creates Docker arguments with environment variables
  */
 export function createEnvironmentArgs(envVars: Record<string, string>): string[] {
-  return Object.entries(envVars).flatMap(([key, value]) => {
-    // When value is empty, pass just the key so Docker reads from host env
-    // When value is set, pass KEY=value explicitly
-    const token = value ? `${key}=${value}` : key;
-    return ["-e", token];
-  });
+  return Object.entries(envVars)
+    // Security hardening: only pass variables that have explicit values set
+    // Avoid implicit host env pass-through with `-e KEY` which can leak secrets unexpectedly
+    .filter(([, value]) => typeof value === 'string' && value.length > 0)
+    .flatMap(([key, value]) => ["-e", `${key}=${value}`]);
 }
 
 /**

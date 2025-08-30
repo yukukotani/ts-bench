@@ -1,5 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
+import { escapeShellArg, escapeForDoubleQuotes } from '../../utils/shell';
 import { BaseAgentBuilder } from '../../utils/docker';
 
 export class AiderAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
@@ -21,11 +21,11 @@ export class AiderAgentBuilder extends BaseAgentBuilder implements AgentBuilder 
         const testFiles = fileList?.testFiles || [];
         
         const fileArgs = sourceFiles.length > 0 
-            ? sourceFiles.map(f => `--file "${f}"`).join(' ')
+            ? sourceFiles.map(f => `--file "${escapeForDoubleQuotes(f)}"`).join(' ')
             : '--file "*.ts"';
             
         const readArgs = testFiles.length > 0 
-            ? testFiles.map(f => `--read "${f}"`).join(' ')
+            ? testFiles.map(f => `--read "${escapeForDoubleQuotes(f)}"`).join(' ')
             : '--read "*.test.ts"';
         
         return `aider --yes-always --no-auto-commits --model ${this.config.model} --message '${escapeShellArg(instructions)}' ${fileArgs} ${readArgs}`;
