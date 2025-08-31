@@ -174,6 +174,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           CUSTOM_INSTRUCTION: ${{ github.event.inputs.custom_instruction }}
         run: |
@@ -212,6 +213,8 @@ jobs:
 
           echo "Running: ${CMD[*]}"
           "${CMD[@]}" | tee benchmark-summary.txt
+
+      # Fixed artifact name; safe-name step not needed
 
       - name: Write Job Summary
         if: always()
@@ -278,7 +281,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: results-${{ github.event.inputs.agent }}-${{ github.event.inputs.model }}
+          name: benchmark-results
           path: |
             ${{ github.event.inputs.result_dir }}/
             benchmark-summary.txt

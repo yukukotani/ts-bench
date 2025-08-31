@@ -8,12 +8,21 @@ export class OpenCodeAgentBuilder extends BaseAgentBuilder implements AgentBuild
     }
 
     protected getEnvironmentVariables(): Record<string, string> {
-        return {
+        const baseEnv = {
             OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
             ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || "",
             GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || "",
             GEMINI_API_KEY: process.env.GOOGLE_API_KEY || ""
-        };
+        } as Record<string, string>;
+
+        if (this.config.provider === 'xai') {
+            return {
+                ...baseEnv,
+                XAI_API_KEY: process.env.XAI_API_KEY || ""
+            };
+        }
+
+        return baseEnv;
     }
 
     protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
