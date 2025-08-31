@@ -105,7 +105,8 @@ export class AgentRunner {
             OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
             GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
             GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
-            DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY || ''
+            DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY || '',
+            XAI_API_KEY: process.env.XAI_API_KEY || ''
         } as Record<string, string>;
 
 
