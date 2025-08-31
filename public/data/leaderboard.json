@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-31T00:00:00.000Z",
+  "lastUpdated": "2025-08-31T03:06:12.779Z",
   "results": {
     "codex-gpt-5": {
       "metadata": {
@@ -16,9 +16,9 @@
         "artifactName": "results-codex-gpt-5"
       },
       "summary": {
-        "successRate": 88.0,
-        "totalDuration": 2292500.0,
-        "avgDuration": 91700.0,
+        "successRate": 88,
+        "totalDuration": 2292500,
+        "avgDuration": 91700,
         "successCount": 22,
         "totalCount": 25,
         "agentSuccessCount": 22,
@@ -42,9 +42,9 @@
         "artifactName": "results-claude-claude-sonnet-4-20250514"
       },
       "summary": {
-        "successRate": 72.0,
-        "totalDuration": 5152500.0,
-        "avgDuration": 206100.0,
+        "successRate": 72,
+        "totalDuration": 5152500,
+        "avgDuration": 206100,
         "successCount": 18,
         "totalCount": 25,
         "agentSuccessCount": 18,
@@ -52,6 +52,259 @@
         "testFailedCount": 7
       },
       "results": []
+    },
+    "gemini-gemini-2.5-pro": {
+      "metadata": {
+        "agent": "gemini",
+        "model": "gemini-2.5-pro",
+        "provider": "google",
+        "version": "0.2.2",
+        "timestamp": "2025-08-31T02:56:56.692Z",
+        "exerciseCount": 25,
+        "benchmarkVersion": "1.0.0",
+        "generatedBy": "ts-bench",
+        "runUrl": "https://github.com/laiso/ts-bench/actions/runs/17351052819",
+        "runId": "17351052819"
+      },
+      "summary": {
+        "successRate": 92,
+        "totalDuration": 4213652,
+        "avgDuration": 168546.1,
+        "successCount": 23,
+        "totalCount": 25,
+        "agentSuccessCount": 25,
+        "testSuccessCount": 23,
+        "testFailedCount": 2
+      },
+      "results": [
+        {
+          "exercise": "acronym",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 105484,
+          "testDuration": 7067,
+          "totalDuration": 112696
+        },
+        {
+          "exercise": "anagram",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 430029,
+          "testDuration": 7305,
+          "totalDuration": 437345
+        },
+        {
+          "exercise": "bank-account",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 420153,
+          "testDuration": 7272,
+          "totalDuration": 427435
+        },
+        {
+          "exercise": "binary-search",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 68181,
+          "testDuration": 7331,
+          "totalDuration": 75523
+        },
+        {
+          "exercise": "binary-search-tree",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 57548,
+          "testDuration": 7330,
+          "totalDuration": 64888
+        },
+        {
+          "exercise": "bowling",
+          "agentSuccess": true,
+          "testSuccess": false,
+          "overallSuccess": false,
+          "testError": "STDOUT: \u001b[31m\u001b[1mUsage Error\u001b[22m\u001b[39m: The nearest package directory (\u001b[38;5;170m/home/runner/work/ts-bench/ts-bench/exercism-typescript/exercises/practice/bowling\u001b[39m) doesn't seem to be part of the project declared in \u001b[38;5;170m/home/runner/work/ts-bench/ts-bench/exercism-typescript\u001b[39m.\n\n- If \u001b[38;5;170m/home/runner/work/ts-bench/ts-bench/exercism-typescript\u001b[39m isn't intended to be a project, remove any yarn.lock and/or package.json file there.\n- If \u001b[38;5;170m/home/runner/work/ts-bench/ts-bench/exercism-typescript\u001b[39m is intended to be a project, it might be that you forgot to list \u001b[38;5;170mexercises/practice/bowling\u001b[39m in its workspace configuration.\n- Finally, if \u001b[38;5;170m/home/runner/work/ts-bench/ts-bench/exercism-typescript\u001b[39m is fine and you intend \u001b[38;5;170mexercises/practice/bowling\u001b[39m to be treated as a completely separate project (not even a workspace), create an empty yarn.lock file in it.\n\n\u001b[1m$ \u001b[22myarn install [--json] [--immutable] [--immutable-cache] [--refresh-lockfile] [--check-cache] [--check-resolutions] [--inline-builds] [--mode #0]\n\nSTDERR: ",
+          "agentDuration": 305416,
+          "testDuration": 291,
+          "totalDuration": 305718
+        },
+        {
+          "exercise": "complex-numbers",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 93486,
+          "testDuration": 7370,
+          "totalDuration": 100868
+        },
+        {
+          "exercise": "connect",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 76306,
+          "testDuration": 7259,
+          "totalDuration": 83575
+        },
+        {
+          "exercise": "crypto-square",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 78528,
+          "testDuration": 7308,
+          "totalDuration": 85847
+        },
+        {
+          "exercise": "diamond",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 65474,
+          "testDuration": 7328,
+          "totalDuration": 72812
+        },
+        {
+          "exercise": "dnd-character",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 55590,
+          "testDuration": 7377,
+          "totalDuration": 62979
+        },
+        {
+          "exercise": "flatten-array",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 65273,
+          "testDuration": 7538,
+          "totalDuration": 72821
+        },
+        {
+          "exercise": "food-chain",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 94883,
+          "testDuration": 7306,
+          "totalDuration": 102200
+        },
+        {
+          "exercise": "house",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 73672,
+          "testDuration": 7431,
+          "totalDuration": 81114
+        },
+        {
+          "exercise": "pascals-triangle",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 495761,
+          "testDuration": 7329,
+          "totalDuration": 503101
+        },
+        {
+          "exercise": "rational-numbers",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 73228,
+          "testDuration": 7438,
+          "totalDuration": 80676
+        },
+        {
+          "exercise": "react",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 156451,
+          "testDuration": 7470,
+          "totalDuration": 163932
+        },
+        {
+          "exercise": "rectangles",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 77776,
+          "testDuration": 7374,
+          "totalDuration": 85161
+        },
+        {
+          "exercise": "relative-distance",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 449392,
+          "testDuration": 7455,
+          "totalDuration": 456858
+        },
+        {
+          "exercise": "robot-name",
+          "agentSuccess": true,
+          "testSuccess": false,
+          "overallSuccess": false,
+          "testError": "STDOUT: \u001b[94m➤\u001b[39m YN0087: Migrated your project to the latest Yarn version 🚀\n\n\u001b[94m➤\u001b[39m \u001b[94m➤\u001b[39m \u001b[90m::group::Resolution step\n\u001b[94m➤\u001b[39m YN0085: │ \u001b[38;5;70m+\u001b[39m \u001b[38;5;166m@exercism/\u001b[39m\u001b[38;5;173mbabel-preset-typescript\u001b[39m\u001b[38;5;111m@\u001b[39m\u001b[38;5;111mnpm:0.6.0\u001b[39m, \u001b[38;5;166m@exercism/\u001b[39m\u001b[38;5;173meslint-config-typescript\u001b[39m\u001b[38;5;111m@\u001b[39m\u001b[38;5;111mnpm:0.8.0\u001b[39m, \u001b[38;5;166m@jest/\u001b[39m\u001b[38;5;173mglobals\u001b[39m\u001b[38;5;111m@\u001b[39m\u001b[38;5;111mnpm:29.7.0\u001b[39m, \u001b[38;5;166m@types/\u001b[39m\u001b[38;5;173mnode\u001b[39m\u001b[38;5;111m@\u001b[39m\u001b[38;5;111mnpm:22.7.9\u001b[39m, and \u001b[38;5;220m625\u001b[39m more.\n::endgroup::\n\u001b[94m➤\u001b[39m \u001b[90m\u001b[94m➤\u001b[39m \u001b[90m::group::Post-resolution validation\n\u001b[93m➤\u001b[39m YN0002: │ \u001b[38;5;166m@exercism/\u001b[39m\u001b[38;5;173mtypescript-robot-name\u001b[39m\u001b[38;5;111m@\u001b[39m\u001b[38;5;111mworkspace:.\u001b[39m doesn't provide \u001b[38;5;166m@babel/\u001b[39m\u001b[38;5;173mcore\u001b[39m (\u001b[38;5;111mp2c5cf\u001b[39m), requested by \u001b[38;5;173mbabel-jest\u001b[39m.\n\u001b[93m➤\u001b[39m YN0086: │ Some peer dependencies are incorrectly met by your project; run \u001b[38;5;111myarn explain peer-requirements <hash>\u001b[39m for details, where \u001b[38;5;111m<hash>\u001b[39m is the six-letter p-prefixed code.\n\u001b[93m➤\u001b[39m YN0086: │ Some peer dependencies are incorrectly met by dependencies; run \u001b[38;5;111myarn explain peer-requirements\u001b[39m for details.\n\u001b[91m➤\u001b[39m YN0028: │ The lockfile would have been modified by this install, which is explicitly forbidden.\n::endgroup::\n\u001b[91m➤\u001b[39m YN0028: The lockfile would have been modified by this install, which is explicitly forbidden.\n\u001b[94m➤\u001b[39m \u001b[90m\u001b[91m➤\u001b[39m \nSTDERR: ",
+          "agentDuration": 263451,
+          "testDuration": 4387,
+          "totalDuration": 267849
+        },
+        {
+          "exercise": "spiral-matrix",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 130357,
+          "testDuration": 7444,
+          "totalDuration": 137811
+        },
+        {
+          "exercise": "transpose",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 104667,
+          "testDuration": 7532,
+          "totalDuration": 112210
+        },
+        {
+          "exercise": "two-bucket",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 96109,
+          "testDuration": 9400,
+          "totalDuration": 105520
+        },
+        {
+          "exercise": "variable-length-quantity",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 113190,
+          "testDuration": 7548,
+          "totalDuration": 120749
+        },
+        {
+          "exercise": "wordy",
+          "agentSuccess": true,
+          "testSuccess": true,
+          "overallSuccess": true,
+          "agentDuration": 86478,
+          "testDuration": 7474,
+          "totalDuration": 93964
+        }
+      ]
     }
   }
 }
