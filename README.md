@@ -12,14 +12,6 @@
 | 3 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | 206.1s | [#732069](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
 <!-- END_LEADERBOARD -->
 
-
-<!-- BEGIN_LEADERBOARD -->
-| Rank | Agent | Model | Success Rate | Solved | Avg Time | Result |
-|:----:|:------|:------|:--------------:|:------:|:----------:|:-----:|
-| 1 | codex | gpt-5 | **88.0%** | 22/25 | 91.7s | [#734992](https://github.com/laiso/ts-bench/actions/runs/17344734992) |
-| 2 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | 206.1s | [#732069](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
-<!-- END_LEADERBOARD -->
-
 ## 🤖 Supported Agents
 
 Currently supported agents:
