@@ -9,7 +9,7 @@ This document summarizes the final design for publishing the leaderboard in ts-b
 - Raw result JSONs are not committed to the repository, but saved as GitHub Actions Artifacts.
 - Workflow separation:
   - Benchmark run (uploads result JSON as Artifact)
-  - Update run (fetches Artifact from any run → merges into JSON → updates README & commits only 2 files)
+  - Update run (fetches Artifact from any run → merges into JSON → updates README → opens a PR with only 2 changed files)
 - README acts as a "template" with an initial table, always ensuring display.
 
 ---
@@ -20,11 +20,11 @@ This document summarizes the final design for publishing the leaderboard in ts-b
 - Run ts-bench to generate result JSONs (including `latest.json`, default: `./results`).
 - Result JSONs are not committed, but uploaded as Artifacts.
 
-2) Update Leaderboard from Artifact (Update)
+2) Propose Leaderboard Update (Update via PR)
 - Retrieve `latest.json` (or first `*.json` if not present) from the specified run's Artifact.
 - Upsert into `public/data/leaderboard.json` (key: `agent-model`).
 - Replace the marker section in README with a Top N table (Result column links to Run).
-- Only `README.md` and `public/data/leaderboard.json` are committed.
+- Open a Pull Request that includes changes to `README.md` and `public/data/leaderboard.json`.
 
 Benefits
 - Repository size remains small (history kept in Artifacts).
@@ -123,10 +123,10 @@ Example (markers)
 - Runs benchmark → saves JSONs under `results/` (including `latest.json`) → uploads as Artifact only.
 
 2) Update Workflow (`.github/workflows/update-leaderboard.yml`)
-- Inputs: `run_id` (required), `artifact_name` (optional), `top_n` (optional).
+- Inputs: `run_id` (required), `artifact_name` (required).
 - Retrieves `latest.json` (or first `*.json`) from specified run's Artifact.
 - Injects `RUN_URL/RUN_ID/ARTIFACT_NAME` as env vars to the script.
-- Script merges into JSON → replaces README section → commits only 2 files.
+- Script merges into JSON → replaces README section → proposes a PR with the changes (no direct commit to `main`).
 - Runs serially: `concurrency: group: leaderboard-update` to avoid conflicts.
 
 ---
@@ -136,9 +136,9 @@ Example (markers)
 1. Run the benchmark
 - Actions → Manual Benchmark Run → specify inputs → after completion, Artifact (`results-<agent>-<model>`) is generated on the Run page.
 
-2. Update the leaderboard
-- Actions → Update Leaderboard from Artifact → specify `run_id` (from URL) and `artifact_name` (optional) → run.
-- After execution, only `README.md` and `public/data/leaderboard.json` are committed/updated.
+2. Update the leaderboard (PR)
+- Actions → Propose Leaderboard Update from Artifact → specify `run_id` (from URL) and `artifact_name` → run.
+- After execution, a PR is opened with changes to `README.md` and `public/data/leaderboard.json`. Review and merge it to update `main`.
 
 ---
 

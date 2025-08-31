@@ -1,99 +1,95 @@
-name: Update Leaderboard from Artifact
+name: Propose Leaderboard Update from Artifact
 
 on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: GitHub Actions run_id to fetch artifact from
+        description: 'The ID of the workflow run that generated the benchmark artifact'
         required: true
         type: string
       artifact_name:
-        description: Artifact name (leave empty to fetch all)
-        required: false
-        default: ""
+        description: 'The name of the artifact to download (e.g., raw-results-claude-claude-3-5-sonnet-20240620)'
+        required: true
         type: string
-      top_n:
-        description: Top N entries to render in README
-        required: false
-        default: "10"
-        type: string
+
+run-name: 'Propose Leaderboard Update from Run ${{ github.event.inputs.run_id }}'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
 
 concurrency:
   group: leaderboard-update
   cancel-in-progress: false
 
 jobs:
-  update:
+  create-leaderboard-pr:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - name: Install deps
+      - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Download artifact from run
+      - name: Download benchmark artifact
         uses: dawidd6/action-download-artifact@v8
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run_id: ${{ inputs.run_id }}
-          workflow: benchmark.yml
-          name: ${{ inputs.artifact_name }}
-          path: downloaded
+          run_id: ${{ github.event.inputs.run_id }}
+          name: ${{ github.event.inputs.artifact_name }}
+          path: ./current-result
 
-      - name: Locate result JSON
-        id: locate
-        shell: bash
+      - name: Find the result file path
+        id: find_file
         run: |
           set -euo pipefail
-          # Prefer latest.json if present; otherwise first *.json we find.
-          file=""
-          if [ -f downloaded/latest.json ]; then
-            file="downloaded/latest.json"
+          FILE_PATH=""
+          if [ -f ./current-result/latest.json ]; then
+            FILE_PATH=./current-result/latest.json
           else
-            # find under downloaded/**
-            file=$(find downloaded -type f -name 'latest.json' -print -quit || true)
-            if [ -z "$file" ]; then
-              file=$(find downloaded -type f -name '*.json' -print -quit || true)
+            FILE_PATH=$(find ./current-result -type f -name 'latest.json' -print -quit || true)
+            if [ -z "$FILE_PATH" ]; then
+              FILE_PATH=$(find ./current-result -type f -name '*.json' -print -quit || true)
             fi
           fi
-          if [ -z "$file" ]; then
+          if [ -z "$FILE_PATH" ]; then
             echo "::error::No JSON file found in artifact" >&2
             exit 1
           fi
-          echo "json=$file" >> "$GITHUB_OUTPUT"
-          echo "Using result JSON: $file"
+          echo "Found result file: $FILE_PATH"
+          echo "result_path=$FILE_PATH" >> $GITHUB_OUTPUT
 
-      - name: Update leaderboard files
+      - name: Update Leaderboard and README files
         env:
-          TOP_N: ${{ inputs.top_n }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ inputs.run_id }}
-          RUN_ID: ${{ inputs.run_id }}
-          ARTIFACT_NAME: ${{ inputs.artifact_name }}
-        run: bun scripts/update-leaderboard.ts "${{ steps.locate.outputs.json }}"
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.event.inputs.run_id }}
+          RUN_ID: ${{ github.event.inputs.run_id }}
+          ARTIFACT_NAME: ${{ github.event.inputs.artifact_name }}
+        run: bun scripts/update-leaderboard.ts ${{ steps.find_file.outputs.result_path }}
 
-      - name: Commit changes (README.md + leaderboard.json)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md public/data/leaderboard.json || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "chore(leaderboard): update from run ${{ inputs.run_id }}"
-          git push
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(leaderboard): Update with results from run ${{ github.event.inputs.run_id }}"
+          branch: "leaderboard-update/${{ github.event.inputs.run_id }}"
+          delete-branch: true
+          title: "🏆 Leaderboard Update: Results from Run #${{ github.event.inputs.run_id }}"
+          body: |
+            This PR was automatically generated by a GitHub Action.
+
+            It updates the leaderboard with the benchmark results from **Run ID `${{ github.event.inputs.run_id }}`**.
+
+            **Artifact used:** `${{ github.event.inputs.artifact_name }}`
+
+            Please review the changes in `README.md` and `public/data/leaderboard.json` before merging.
+          labels: |
+            benchmark
+            automated-pr
+

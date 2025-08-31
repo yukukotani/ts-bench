@@ -135,30 +135,39 @@ function buildTopTable(data: LeaderboardData, topN: number): string {
 }
 
 async function updateReadmeWithTable(table: string) {
-  const begin = '<!-- BEGIN_LEADERBOARD -->';
-  const end = '<!-- END_LEADERBOARD -->';
-  const block = `${begin}\n${table}\n${end}`;
+  const beginRaw = '<!-- BEGIN_LEADERBOARD -->';
+  const endRaw = '<!-- END_LEADERBOARD -->';
+  const block = `${beginRaw}\n${table}\n${endRaw}`;
 
-  const content = await readFile(README_PATH, 'utf-8');
+  let content = await readFile(README_PATH, 'utf-8');
 
-  const markerRe = new RegExp(`${escapeRegExp(begin)}[\n\r\s\S]*?${escapeRegExp(end)}`);
-  if (markerRe.test(content)) {
-    const replaced = content.replace(markerRe, block);
-    await writeFile(README_PATH, replaced, 'utf-8');
+  const beginRe = /<!--\s*BEGIN_LEADERBOARD\s*-->/gi;
+  const endRe = /<!--\s*END_LEADERBOARD\s*-->/gi;
+
+  const beginMatches = [...content.matchAll(beginRe)];
+  const endMatches = [...content.matchAll(endRe)];
+
+  if (beginMatches.length > 0 && endMatches.length > 0) {
+    const sectionReAll = /<!--\s*BEGIN_LEADERBOARD\s*-->[\s\S]*?<!--\s*END_LEADERBOARD\s*-->/gi;
+    content = content.replace(sectionReAll, '');
+    content = insertBlockAtHeaderOrTop(content, block);
+    await writeFile(README_PATH, content, 'utf-8');
     return;
   }
 
+  content = insertBlockAtHeaderOrTop(content, block);
+  await writeFile(README_PATH, content, 'utf-8');
+}
+
+function insertBlockAtHeaderOrTop(content: string, block: string): string {
   const lines = content.split(/\r?\n/);
-  const headerIdx = lines.findIndex((l) => /^##\s+Leaderboard\s*$/i.test(l.trim()));
+  const headerIdx = lines.findIndex((l) => /^\s{0,3}##\s+Leaderboard\s*$/i.test(l));
   if (headerIdx >= 0) {
     const before = lines.slice(0, headerIdx + 1).join('\n');
     const after = lines.slice(headerIdx + 1).join('\n');
-    const combined = `${before}\n\n${block}\n\n${after}`;
-    await writeFile(README_PATH, combined, 'utf-8');
-    return;
+    return `${before}\n\n${block}\n\n${after}`;
   }
-
-  await writeFile(README_PATH, `${block}\n\n${content}`, 'utf-8');
+  return `${block}\n\n${content}`;
 }
 
 async function ensureDirectoryExists(filePath: string) {
@@ -169,7 +178,7 @@ async function ensureDirectoryExists(filePath: string) {
 }
 
 function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return s.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 }
 
 main().catch((e) => {
