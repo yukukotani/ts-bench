@@ -12,7 +12,11 @@
 | 3 | opencode | opencode/grok-code | **88.0%** | 22/25 | 97.0s | [#083421](https://github.com/laiso/ts-bench/actions/runs/17355083421) |
 | 4 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | 206.1s | [#732069](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
 | 5 | qwen | qwen3-coder-plus | **64.0%** | 16/25 | 123.9s | [#246268](https://github.com/laiso/ts-bench/actions/runs/17356246268) |
+| 6 | claude | deepseek-reasoner | **32.0%** | 8/25 | 284.0s | [#196715](https://github.com/laiso/ts-bench/actions/runs/17357196715) |
 <!-- END_LEADERBOARD -->
+
+
+
 
 
 
