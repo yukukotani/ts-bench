@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { CLAUDE_CODE_CONTAINER, EXERCISM_PRACTICE_PATH, HEADER_INSTRUCTION } from './config/constants';
+import { TS_BENCH_CONTAINER, EXERCISM_PRACTICE_PATH, HEADER_INSTRUCTION } from './config/constants';
 import { BunCommandExecutor } from './utils/shell';
 import { ConsoleLogger } from './utils/logger';
 import { parseCommandLineArgs, printHelp } from './utils/cli';
@@ -50,7 +50,7 @@ async function main(): Promise<void> {
             executor,
             exerciseReader,
             logger,
-            CLAUDE_CODE_CONTAINER,
+            TS_BENCH_CONTAINER,
             HEADER_INSTRUCTION,
             args.customInstruction
         );
@@ -58,7 +58,7 @@ async function main(): Promise<void> {
         const testRunner = new TestRunner(
             executor,
             logger,
-            CLAUDE_CODE_CONTAINER
+            TS_BENCH_CONTAINER
         );
         
         const exerciseRunner = new ExerciseRunner(
