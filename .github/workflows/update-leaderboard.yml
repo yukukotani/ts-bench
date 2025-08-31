@@ -17,6 +17,7 @@ run-name: 'Propose Leaderboard Update from Run ${{ github.event.inputs.run_id }}
 permissions:
   contents: write
   pull-requests: write
+  issues: write
   actions: read
 
 concurrency:
@@ -76,7 +77,8 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use a repo/org secret PAT if provided, otherwise fallback to GITHUB_TOKEN
+          token: ${{ secrets.PR_TOKEN || github.token }}
           commit-message: "feat(leaderboard): Update with results from run ${{ github.event.inputs.run_id }}"
           branch: "leaderboard-update/${{ github.event.inputs.run_id }}"
           delete-branch: true
@@ -92,4 +94,3 @@ jobs:
           labels: |
             benchmark
             automated-pr
-

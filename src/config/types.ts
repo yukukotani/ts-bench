@@ -1,4 +1,4 @@
-export type AgentType = 'claude' | 'goose' | 'aider' | 'codex' | 'gemini' | 'opencode' | 'qwen';
+export type AgentType = 'claude' | 'goose' | 'aider' | 'codex' | 'gemini' | 'opencode' | 'qwen' | 'cursor';
 export type ProviderType = 'openai' | 'anthropic' | 'google' | 'openrouter' | 'dashscope' | 'xai';
 
 export interface AgentResult {

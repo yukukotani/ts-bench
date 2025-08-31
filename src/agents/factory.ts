@@ -7,6 +7,7 @@ import { CodexAgentBuilder } from './builders/codex';
 import { GeminiAgentBuilder } from './builders/gemini';
 import { OpenCodeAgentBuilder } from './builders/opencode';
 import { QwenAgentBuilder } from './builders/qwen';
+import { CursorAgentBuilder } from './builders/cursor';
 
 export class AgentFactory {
     static create(config: BenchmarkConfig, containerName: string): AgentBuilder {
@@ -31,6 +32,8 @@ export class AgentFactory {
                 return new OpenCodeAgentBuilder(agentConfig);
             case 'qwen':
                 return new QwenAgentBuilder(agentConfig);
+            case 'cursor':
+                return new CursorAgentBuilder(agentConfig);
             default:
                 throw new Error(`Unknown agent: ${config.agent}`);
         }

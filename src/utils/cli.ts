@@ -8,7 +8,7 @@ Usage:
   bun src/index.ts [options]
 
 Basic Options:
-  --agent <agent>        Agent to use (claude, goose, aider, codex, gemini, opencode, qwen) [default: claude]
+  --agent <agent>        Agent to use (claude, goose, aider, codex, gemini, opencode, qwen, cursor) [default: claude]
   --model <model>        Model to use [default: sonnet]
   --provider <provider>  Provider (openai, anthropic, google, openrouter, dashscope, xai) [default: openai]
   --version <version>    Agent version (e.g. 1.2.3) [default: agent-specific default]

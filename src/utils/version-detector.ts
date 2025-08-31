@@ -41,6 +41,8 @@ export class VersionDetector {
                 return ['qwen', '--version'];
             case 'opencode':
                 return ['opencode', '--version'];
+            case 'cursor':
+                return ['cursor-agent', '--version'];
             default:
                 throw new Error(`Unknown agent: ${agent}`);
         }
@@ -84,7 +86,10 @@ export class VersionDetector {
                 // OpenCode output: "opencode 1.0.0" or "1.0.0"
                 const opencodeMatch = cleanOutput.match(/(?:opencode\s+)?(\d+\.\d+\.\d+)/i);
                 return opencodeMatch ? opencodeMatch[1] : this.extractGenericVersion(cleanOutput);
-                
+            case 'cursor':
+                // Cursor Agent output: generic semver or text containing version
+                return this.extractGenericVersion(cleanOutput);
+            
             default:
                 return this.extractGenericVersion(cleanOutput);
         }

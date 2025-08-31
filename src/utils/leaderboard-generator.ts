@@ -300,6 +300,7 @@ export class LeaderboardGenerator {
                 case 'codex': return '1.0.0';
                 case 'gemini': return '1.0.0';
                 case 'qwen': return '0.0.1';
+                case 'cursor': return '1.0.0';
                 default: return 'unknown';
             }
         }
@@ -313,6 +314,7 @@ export class LeaderboardGenerator {
             case 'aider': return 'Aider';
             case 'gemini': return 'Gemini CLI';
             case 'qwen': return 'Qwen Code';
+            case 'cursor': return 'Cursor Agent';
             default: return agent.charAt(0).toUpperCase() + agent.slice(1).toLowerCase();
         }
     }
