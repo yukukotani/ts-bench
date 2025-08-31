@@ -4,12 +4,25 @@
 
 ## Leaderboard
 
-| Rank | Agent | Model | Success Rate | Solved | Avg Time per Correct | Result |
-|:----:|:------|:------|:--------------:|:------:|:--------------------:|:---:|
-| 🏆 1 | [codex](https://developers.openai.com/codex/cli/) | gpt-5 | **88.0%** | 22/25 | **91.7s** | [#13](https://github.com/laiso/ts-bench/actions/runs/17344734992) |
-| 2 | [claude](https://www.anthropic.com/claude-code) | claude-sonnet-4-20250514 | **72.0%** | 18/25 | **206.1s** | [#12](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
+<!-- BEGIN_LEADERBOARD -->
+| Rank | Agent | Model | Success Rate | Solved | Avg Time | Result |
+|:----:|:------|:------|:--------------:|:------:|:----------:|:-----:|
+| 1 | codex | gpt-5 | **88.0%** | 22/25 | 91.7s | [#734992](https://github.com/laiso/ts-bench/actions/runs/17344734992) |
+| 2 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | 206.1s | [#732069](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
+<!-- END_LEADERBOARD -->
 
-**TBD**
+## 🤖 Supported Agents
+
+Currently supported agents:
+
+* [Claude Code](https://www.anthropic.com/claude-code)
+* [Codex CLI](https://developers.openai.com/codex/cli/)
+* [Gemini CLI](https://cloud.google.com/gemini/docs/codeassist/gemini-cli)
+* [OpenCode](https://opencode.ai/)
+* [Goose CLI](https://block.github.io/goose/)
+* [Qwen Code](https://qwenlm.github.io/qwen-code-docs/)
+
+and [Aider](https://www.aider.com/)
 
 ## 📖 Vision & Principles
 
@@ -30,6 +43,11 @@ All benchmark results are generated and published via GitHub Actions.
 
 Each results page provides a formatted summary and downloadable artifacts containing raw data (JSON).
 
+## Documentation
+For detailed documentation, see:
+
+- [Leaderboard Operation Design](docs/leaderboard.md): Explains how the leaderboard is updated and maintained.
+
 ## 🚀 Getting Started
 
 ### Installation
@@ -49,14 +67,3 @@ bun src/index.ts --agent claude --model claude-3-5-sonnet-20240620
 # Run only the 'acronym' problem with Aider (GPT-4o)
 bun src/index.ts --agent aider --model gpt-4o --exercise acronym
 ```
-
-## 🤖 Supported Agents
-
-Currently supported agents:
-
-* `claude`
-* `goose`
-* `aider`
-* `codex`
-* `gemini`
-* `opencode`
