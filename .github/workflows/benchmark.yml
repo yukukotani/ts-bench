@@ -22,7 +22,7 @@ on:
         required: true
         default: claude-3-5-haiku-20241022
       provider:
-        description: Provider (openai, anthropic, google, openrouter, dashscope)
+        description: Provider (openai, anthropic, google, openrouter, dashscope, deepseek)
         required: true
         default: anthropic
         type: choice
@@ -33,6 +33,7 @@ on:
           - openrouter
           - dashscope
           - xai
+          - deepseek
       use_docker:
         description: Run agent in Docker
         required: false
@@ -181,6 +182,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           CUSTOM_INSTRUCTION: ${{ github.event.inputs.custom_instruction }}
