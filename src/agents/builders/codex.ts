@@ -9,7 +9,7 @@ export class CodexAgentBuilder extends BaseAgentBuilder implements AgentBuilder 
     protected getEnvironmentVariables(): Record<string, string> {
         return {
             OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
-            CODEX_RUST: '1'
+            OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || ""
         };
     }
 
@@ -17,6 +17,7 @@ export class CodexAgentBuilder extends BaseAgentBuilder implements AgentBuilder 
         return [
             'codex', 'exec',
             '-c', 'model_reasoning_effort=high',
+            '-c', `model_provider=${this.config.provider || 'openai'}`,
             '--full-auto',
             '--skip-git-repo-check',
             '-m', this.config.model,
