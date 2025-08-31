@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { dirname } from 'path';
 import { existsSync } from 'fs';
+import { EOL } from 'os';
 
 interface SavedBenchmarkResult {
   metadata: {
@@ -37,6 +38,7 @@ interface LeaderboardData {
 
 const LEADERBOARD_PATH = './public/data/leaderboard.json';
 const README_PATH = './README.md';
+const COMMIT_BODY_PATH = './commit-body.md';
 const TOP_N = Number(process.env.TOP_N ?? '10');
 
 async function main() {
@@ -50,8 +52,9 @@ async function main() {
   if (existsSync(LEADERBOARD_PATH)) {
     leaderboardData = JSON.parse(await readFile(LEADERBOARD_PATH, 'utf-8')) as LeaderboardData;
   } else {
-    leaderboardData = { lastUpdated: new Date().toISOString(), results: {} };
+    leaderboardData = { lastUpdated: '', results: {} };
   }
+  const oldLeaderboardData: LeaderboardData = JSON.parse(JSON.stringify(leaderboardData));
 
   const newResult: SavedBenchmarkResult = JSON.parse(await readFile(newResultPath, 'utf-8')) as SavedBenchmarkResult;
   validateResult(newResult);
@@ -72,6 +75,14 @@ async function main() {
 
   leaderboardData.results[key] = merged;
   leaderboardData.lastUpdated = new Date().toISOString();
+
+  try {
+    const diffMarkdown = generateDiffMarkdown(oldLeaderboardData, leaderboardData, key);
+    await writeFile(COMMIT_BODY_PATH, diffMarkdown, 'utf-8');
+    console.log(`📝 Commit body generated: ${COMMIT_BODY_PATH}`);
+  } catch (e) {
+    console.warn('Failed to generate commit body markdown:', e);
+  }
 
   await ensureDirectoryExists(LEADERBOARD_PATH);
   await writeFile(LEADERBOARD_PATH, JSON.stringify(leaderboardData, null, 2), 'utf-8');
@@ -132,6 +143,63 @@ function buildTopTable(data: LeaderboardData, topN: number): string {
   });
 
   return [header, separator, ...rows].join('\n');
+}
+
+function getRankedList(data: LeaderboardData) {
+  return Object.entries(data.results)
+    .map(([k, r]) => ({ key: k, ...r }))
+    .sort((a: any, b: any) => {
+      if (b.summary.successRate !== a.summary.successRate) {
+        return b.summary.successRate - a.summary.successRate;
+      }
+      return a.summary.avgDuration - b.summary.avgDuration;
+    })
+    .map((r, i) => ({
+      key: r.key as string,
+      rank: i + 1,
+      metadata: r.metadata,
+      summary: r.summary,
+    }));
+}
+
+function generateDiffMarkdown(oldData: LeaderboardData, newData: LeaderboardData, updatedKey: string): string {
+  const oldRanks = getRankedList(oldData);
+  const newRanks = getRankedList(newData);
+
+  const oldRankMap = new Map(oldRanks.map((r) => [r.key, r]));
+  const updatedEntry = newRanks.find((r) => r.key === updatedKey);
+
+  if (!updatedEntry) return 'No changes detected.';
+
+  const oldEntry = oldRankMap.get(updatedKey);
+  const lines: string[] = [];
+
+  const keyLabel = `\`${updatedKey}\``;
+  if (!oldEntry) {
+    lines.push(`🚀 New Entry: ${keyLabel} entered Leaderboard at rank ${updatedEntry.rank}`);
+  } else {
+    if (updatedEntry.rank < oldEntry.rank) {
+      lines.push(`🔼 Rank Up: ${keyLabel} from ${oldEntry.rank} → ${updatedEntry.rank}`);
+    } else if (updatedEntry.rank > oldEntry.rank) {
+      lines.push(`🔽 Rank Down: ${keyLabel} from ${oldEntry.rank} → ${updatedEntry.rank}`);
+    } else {
+      lines.push(`🔄 Rank Unchanged: ${keyLabel} remains at ${updatedEntry.rank}`);
+    }
+  }
+
+  // Explicit Leaderboard rank transition without '#'
+  const oldRankStr = oldEntry ? String(oldEntry.rank) : 'N/A';
+  lines.push(`- Leaderboard Rank: ${oldRankStr} -> ${updatedEntry.rank}`);
+
+  const oldRate = oldEntry ? Number(oldEntry.summary.successRate).toFixed(1) + '%' : 'N/A';
+  const newRate = Number(updatedEntry.summary.successRate).toFixed(1) + '%';
+  lines.push(`- Success Rate: ${newRate} (was ${oldRate})`);
+
+  const oldTime = oldEntry ? (Number(oldEntry.summary.avgDuration) / 1000).toFixed(1) + 's' : 'N/A';
+  const newTime = (Number(updatedEntry.summary.avgDuration) / 1000).toFixed(1) + 's';
+  lines.push(`- Avg Time: ${newTime} (was ${oldTime})`);
+
+  return lines.join(EOL);
 }
 
 async function updateReadmeWithTable(table: string) {
