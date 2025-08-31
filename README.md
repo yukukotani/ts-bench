@@ -15,15 +15,6 @@
 | 6 | claude | deepseek-reasoner | **32.0%** | 8/25 | 284.0s | [#196715](https://github.com/laiso/ts-bench/actions/runs/17357196715) |
 <!-- END_LEADERBOARD -->
 
-
-
-
-
-
-
-
-
-
 ## 🤖 Supported Agents
 
 Currently supported agents:
@@ -59,6 +50,7 @@ Each results page provides a formatted summary and downloadable artifacts contai
 ## Documentation
 For detailed documentation, see:
 
+- [Environment Setup](docs/environment.md): Details on setting up the local and Docker environments.
 - [Leaderboard Operation Design](docs/leaderboard.md): Explains how the leaderboard is updated and maintained.
 
 ## 🚀 Getting Started
