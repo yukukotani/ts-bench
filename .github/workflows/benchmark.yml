@@ -40,6 +40,10 @@ on:
         description: "Exercise selection: number (first N), comma list, or name"
         required: false
         default: ""
+      custom_instruction:
+        description: "Additional instruction text appended to the prompt"
+        required: false
+        default: ""
       save_result:
         description: Save result JSON
         required: false
@@ -170,6 +174,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          CUSTOM_INSTRUCTION: ${{ github.event.inputs.custom_instruction }}
         run: |
           set -euo pipefail
           mkdir -p "${{ github.event.inputs.result_dir }}"
@@ -199,6 +204,11 @@ jobs:
             CMD+=(--verbose)
           fi
 
+          # Custom instruction (append to prompt)
+          if [ -n "${CUSTOM_INSTRUCTION:-}" ]; then
+            CMD+=(--custom-instruction "${CUSTOM_INSTRUCTION}")
+          fi
+
           echo "Running: ${CMD[*]}"
           "${CMD[@]}" | tee benchmark-summary.txt
 
@@ -211,6 +221,12 @@ jobs:
             echo "- Agent: ${{ github.event.inputs.agent }}"
             echo "- Model: ${{ github.event.inputs.model }}"
             echo "- Provider: ${{ github.event.inputs.provider }}"
+            if [ -n "${{ github.event.inputs.custom_instruction }}" ]; then
+              PREVIEW=$(printf %s "${{ github.event.inputs.custom_instruction }}" | tr '\n' ' ' | sed -E 's/\s+/ /g' | cut -c1-140)
+              echo "- Custom Instruction: ${PREVIEW}$( [ ${#PREVIEW} -eq 140 ] && echo '…' )"
+            else
+              echo "- Custom Instruction: (none)"
+            fi
 
             # If latest.json exists, print a compact summary
             if [ -f "${{ github.event.inputs.result_dir }}/latest.json" ]; then
