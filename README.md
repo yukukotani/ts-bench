@@ -11,7 +11,11 @@
 | 2 | codex | gpt-5 | **88.0%** | 22/25 | 91.7s | [#734992](https://github.com/laiso/ts-bench/actions/runs/17344734992) |
 | 3 | opencode | opencode/grok-code | **88.0%** | 22/25 | 97.0s | [#083421](https://github.com/laiso/ts-bench/actions/runs/17355083421) |
 | 4 | claude | claude-sonnet-4-20250514 | **72.0%** | 18/25 | 206.1s | [#732069](https://github.com/laiso/ts-bench/actions/runs/17344732069) |
+| 5 | qwen | qwen3-coder-plus | **64.0%** | 16/25 | 123.9s | [#246268](https://github.com/laiso/ts-bench/actions/runs/17356246268) |
 <!-- END_LEADERBOARD -->
+
+
+
 
 
 
