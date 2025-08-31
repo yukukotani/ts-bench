@@ -1,0 +1,57 @@
+{
+  "lastUpdated": "2025-08-31T00:00:00.000Z",
+  "results": {
+    "codex-gpt-5": {
+      "metadata": {
+        "agent": "codex",
+        "model": "gpt-5",
+        "provider": "openai",
+        "version": "unknown",
+        "timestamp": "2025-08-30T12:30:00.000Z",
+        "exerciseCount": 25,
+        "benchmarkVersion": "1.0.0",
+        "generatedBy": "ts-bench",
+        "runUrl": "https://github.com/laiso/ts-bench/actions/runs/17344734992",
+        "runId": "17344734992",
+        "artifactName": "results-codex-gpt-5"
+      },
+      "summary": {
+        "successRate": 88.0,
+        "totalDuration": 2292500.0,
+        "avgDuration": 91700.0,
+        "successCount": 22,
+        "totalCount": 25,
+        "agentSuccessCount": 22,
+        "testSuccessCount": 22,
+        "testFailedCount": 3
+      },
+      "results": []
+    },
+    "claude-claude-sonnet-4-20250514": {
+      "metadata": {
+        "agent": "claude",
+        "model": "claude-sonnet-4-20250514",
+        "provider": "anthropic",
+        "version": "unknown",
+        "timestamp": "2025-08-30T12:00:00.000Z",
+        "exerciseCount": 25,
+        "benchmarkVersion": "1.0.0",
+        "generatedBy": "ts-bench",
+        "runUrl": "https://github.com/laiso/ts-bench/actions/runs/17344732069",
+        "runId": "17344732069",
+        "artifactName": "results-claude-claude-sonnet-4-20250514"
+      },
+      "summary": {
+        "successRate": 72.0,
+        "totalDuration": 5152500.0,
+        "avgDuration": 206100.0,
+        "successCount": 18,
+        "totalCount": 25,
+        "agentSuccessCount": 18,
+        "testSuccessCount": 18,
+        "testFailedCount": 7
+      },
+      "results": []
+    }
+  }
+}

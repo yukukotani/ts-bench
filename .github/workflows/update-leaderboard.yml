@@ -1,0 +1,99 @@
+name: Update Leaderboard from Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: GitHub Actions run_id to fetch artifact from
+        required: true
+        type: string
+      artifact_name:
+        description: Artifact name (leave empty to fetch all)
+        required: false
+        default: ""
+        type: string
+      top_n:
+        description: Top N entries to render in README
+        required: false
+        default: "10"
+        type: string
+
+concurrency:
+  group: leaderboard-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install deps
+        run: bun install --frozen-lockfile
+
+      - name: Download artifact from run
+        uses: dawidd6/action-download-artifact@v8
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ inputs.run_id }}
+          workflow: benchmark.yml
+          name: ${{ inputs.artifact_name }}
+          path: downloaded
+
+      - name: Locate result JSON
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Prefer latest.json if present; otherwise first *.json we find.
+          file=""
+          if [ -f downloaded/latest.json ]; then
+            file="downloaded/latest.json"
+          else
+            # find under downloaded/**
+            file=$(find downloaded -type f -name 'latest.json' -print -quit || true)
+            if [ -z "$file" ]; then
+              file=$(find downloaded -type f -name '*.json' -print -quit || true)
+            fi
+          fi
+          if [ -z "$file" ]; then
+            echo "::error::No JSON file found in artifact" >&2
+            exit 1
+          fi
+          echo "json=$file" >> "$GITHUB_OUTPUT"
+          echo "Using result JSON: $file"
+
+      - name: Update leaderboard files
+        env:
+          TOP_N: ${{ inputs.top_n }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ inputs.run_id }}
+          RUN_ID: ${{ inputs.run_id }}
+          ARTIFACT_NAME: ${{ inputs.artifact_name }}
+        run: bun scripts/update-leaderboard.ts "${{ steps.locate.outputs.json }}"
+
+      - name: Commit changes (README.md + leaderboard.json)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md public/data/leaderboard.json || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(leaderboard): update from run ${{ inputs.run_id }}"
+          git push
