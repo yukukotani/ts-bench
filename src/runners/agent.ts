@@ -46,9 +46,12 @@ export class AgentRunner {
                 progressMonitor.start();
             }
 
-            const execOptions = useDocker ? {} : {
+            const execOptions = useDocker ? { 
+                timeout: config.timeout
+            } : {
                 cwd: join(process.cwd(), exercisePath),
-                env: this.getAgentEnvironment(config)
+                env: this.getAgentEnvironment(config),
+                timeout: config.timeout
             };
             const result = await this.executor.execute(args, execOptions);
             const duration = Date.now() - startTime;

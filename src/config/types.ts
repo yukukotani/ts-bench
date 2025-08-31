@@ -38,6 +38,7 @@ export interface BenchmarkConfig {
     useDocker?: boolean;
     version?: string;
     showProgress?: boolean;
+    timeout?: number; // seconds
 }
 
 export interface CLIArgs {
@@ -67,6 +68,7 @@ export interface CLIArgs {
     testOnly?: boolean;
     printInstructions?: boolean;
     customInstruction?: string;
+    timeout?: number; // seconds
 }
 
 

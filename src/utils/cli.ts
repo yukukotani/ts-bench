@@ -27,6 +27,7 @@ Execution Options:
   --test-only            Run tests only on current code (skip agent execution)
   --print-instructions   Print instructions that would be sent to the agent (dry run)
   --custom-instruction   Add custom instruction to the end of the prompt
+  --timeout <seconds>    Per-exercise timeout in seconds [default: 300]
 
 Output Options:
   --output-format <fmt>  Output format (console, json) [default: console]
@@ -118,6 +119,12 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
     const showProgress = process.argv.includes('--show-progress');
     const testOnly = process.argv.includes('--test-only');
     const printInstructions = process.argv.includes('--print-instructions');
+    
+    // Timeout option (seconds), default 300
+    const timeoutIndex = process.argv.indexOf('--timeout');
+    const timeout = timeoutIndex !== -1 && timeoutIndex + 1 < process.argv.length
+        ? parseInt(process.argv[timeoutIndex + 1], 10)
+        : 300;
 
     // Result saving options
     const saveResult = process.argv.includes('--save-result');
@@ -203,6 +210,7 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
         showProgress,
         testOnly,
         printInstructions,
-        customInstruction
+        customInstruction,
+        timeout
     };
 }
