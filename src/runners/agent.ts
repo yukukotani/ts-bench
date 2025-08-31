@@ -5,6 +5,8 @@ import type { CommandExecutor } from '../utils/shell';
 import type { Logger } from '../utils/logger';
 import { ProgressMonitor } from '../utils/progress-monitor';
 import { join } from 'path';
+import { LocalExecutionStrategy } from '../execution/local-strategy';
+import { DockerExecutionStrategy } from '../execution/docker-strategy';
 
 export class AgentRunner {
     constructor(
@@ -33,27 +35,23 @@ export class AgentRunner {
             const agentBuilder = AgentFactory.create(config, this.containerName);
             const instructions = await this.exerciseReader.getInstructions(exercise, this.baseInstruction, this.customInstruction);
             const fileList = await this.exerciseReader.getFileList(exercise);
-            const baseArgs = await agentBuilder.build(exercisePath, instructions, useDocker, fileList);
+            const coreCommand = await agentBuilder.buildCommand(instructions, fileList);
 
-            // Add test file mounts only for Docker execution
-            const args = useDocker ? this.addTestFileMounts(baseArgs, exercisePath, fileList.testFiles) : baseArgs;
+            const strategy = useDocker
+                ? new DockerExecutionStrategy(this.containerName)
+                : new LocalExecutionStrategy();
+            const prepared = strategy.prepare(coreCommand, { exercisePath, testFiles: fileList.testFiles });
 
             if (config.verbose) {
-                this.logger.logAgentCommand(args);
+                this.logger.logAgentCommand(prepared.command);
             }
 
             if (progressMonitor) {
                 progressMonitor.start();
             }
 
-            const execOptions = useDocker ? { 
-                timeout: config.timeout
-            } : {
-                cwd: join(process.cwd(), exercisePath),
-                env: this.getAgentEnvironment(config),
-                timeout: config.timeout
-            };
-            const result = await this.executor.execute(args, execOptions);
+            const execOptions = { ...prepared.options, timeout: config.timeout };
+            const result = await this.executor.execute(prepared.command, execOptions);
             const duration = Date.now() - startTime;
 
             if (progressMonitor) {
@@ -89,90 +87,5 @@ export class AgentRunner {
         return await this.exerciseReader.getTestFiles(exercise);
     }
 
-    private addTestFileMounts(args: string[], exercisePath: string, testFiles: string[]): string[] {
-        const mountIndex = args.findIndex(arg => arg === this.containerName);
-        const result = [...args];
-
-        testFiles.forEach(testFile => {
-            const hostPath = join(process.cwd(), exercisePath, testFile);
-            const containerPath = `/workspace/${testFile}`;
-            result.splice(mountIndex, 0, "-v", `${hostPath}:${containerPath}:ro`);
-        });
-
-        return result;
-    }
-
-    private getAgentEnvironment(config: BenchmarkConfig): Record<string, string> {
-        const baseEnv = {
-            ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
-            OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
-            GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
-            GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
-            DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY || '',
-            XAI_API_KEY: process.env.XAI_API_KEY || ''
-        } as Record<string, string>;
-
-
-        // Agent-specific environment variables
-        switch (config.agent) {
-            case 'claude':
-                if (config.provider === 'dashscope') {
-                    baseEnv.ANTHROPIC_AUTH_TOKEN = process.env.DASHSCOPE_API_KEY || baseEnv.ANTHROPIC_API_KEY;
-                    baseEnv.ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL || 'https://dashscope-intl.aliyuncs.com/api/v2/apps/claude-code-proxy';
-                }
-                return baseEnv;
-            case 'goose':
-                return {
-                    ...baseEnv,
-                    GOOSE_MODEL: config.model,
-                    GOOSE_PROVIDER: config.provider,
-                    GOOSE_DISABLE_KEYRING: '1'
-                };
-            case 'aider':
-                return {
-                    ...baseEnv,
-                    AIDER_GIT: 'false',
-                    AIDER_AUTO_COMMITS: 'false',
-                    AIDER_SHOW_RELEASE_NOTES: 'false',
-                    AIDER_SKIP_SANITY_CHECK_REPO: 'true',
-                    AIDER_CHAT_HISTORY_FILE: '/dev/null',
-                    AIDER_INPUT_HISTORY_FILE: '/dev/null'
-                };
-            case 'codex':
-                return {
-                    ...baseEnv,
-                    CODEX_RUST: '1'
-                };
-            case 'gemini':
-                return {
-                    ...baseEnv,
-                    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
-                    GEMINI_API_KEY: process.env.GEMINI_API_KEY || ''
-                };
-            case 'qwen':
-                if (config.provider === 'openrouter') {
-                    return {
-                        ...baseEnv,
-                        OPENAI_BASE_URL: "https://openrouter.ai/api/v1",
-                        OPENAI_API_KEY: process.env.OPENROUTER_API_KEY || "",
-                        OPENAI_MODEL: config.model
-                    };
-                } else {
-                    return {
-                        OPENAI_BASE_URL: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-                        OPENAI_API_KEY: process.env.DASHSCOPE_API_KEY || "",
-                        OPENAI_MODEL: config.model,
-                        GOOGLE_API_KEY: '',
-                        GEMINI_API_KEY: ''
-                    };
-                }
-            case 'cursor':
-                return {
-                    ...baseEnv,
-                    CURSOR_API_KEY: process.env.CURSOR_API_KEY || ''
-                };
-            default:
-                return baseEnv;
-        }
-    }
+    
 }

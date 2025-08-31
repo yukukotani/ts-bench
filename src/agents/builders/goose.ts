@@ -1,6 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
-import { BaseAgentBuilder } from '../../utils/docker';
+import { BaseAgentBuilder } from '../base';
 
 export class GooseAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     constructor(agentConfig: AgentConfig) {
@@ -18,15 +17,11 @@ export class GooseAgentBuilder extends BaseAgentBuilder implements AgentBuilder 
         };
     }
 
-    protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
-        return `goose run --with-builtin "developer" --text '${escapeShellArg(instructions)}'`;
-    }
-
-    async buildLocalCommand(_exercisePath: string, instructions: string, _fileList?: import('../types').FileList): Promise<string[]> {
+    protected getCoreArgs(instructions: string): string[] {
         return [
-            "goose", "run", 
-            "--with-builtin", "developer",
-            "--text", instructions
+            'goose', 'run',
+            '--with-builtin', 'developer',
+            '--text', instructions
         ];
     }
 }

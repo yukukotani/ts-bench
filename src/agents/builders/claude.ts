@@ -1,6 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
-import { BaseAgentBuilder } from '../../utils/docker';
+import { BaseAgentBuilder } from '../base';
 
 export class ClaudeAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     constructor(agentConfig: AgentConfig) {
@@ -20,17 +19,12 @@ export class ClaudeAgentBuilder extends BaseAgentBuilder implements AgentBuilder
         return env;
     }
 
-    protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
-        return `claude --dangerously-skip-permissions --model ${this.config.model} -p '${escapeShellArg(instructions)}'`;
-    }
-
-    async buildLocalCommand(_exercisePath: string, instructions: string, _fileList?: import('../types').FileList): Promise<string[]> {
-        const args = [
-            "claude",
-            "--dangerously-skip-permissions",
-            "--model", this.config.model,
-            "-p", instructions
+    protected getCoreArgs(instructions: string): string[] {
+        return [
+            'claude',
+            '--dangerously-skip-permissions',
+            '--model', this.config.model,
+            '-p', instructions
         ];
-        return args;
     }
 }

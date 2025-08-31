@@ -1,6 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
-import { BaseAgentBuilder } from '../../utils/docker';
+import { BaseAgentBuilder } from '../base';
 
 export class GeminiAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     constructor(agentConfig: AgentConfig) {
@@ -14,14 +13,12 @@ export class GeminiAgentBuilder extends BaseAgentBuilder implements AgentBuilder
         };
     }
 
-    protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
-        return `echo '${escapeShellArg(instructions)}' | gemini --model ${this.config.model} -y -p`;
-    }
-
-    async buildLocalCommand(_exercisePath: string, instructions: string, _fileList?: import('../types').FileList): Promise<string[]> {
+    protected getCoreArgs(instructions: string): string[] {
         return [
-            "sh", "-c",
-            `echo '${escapeShellArg(instructions)}' | gemini --model ${this.config.model} -y -p`
+            'gemini',
+            '--model', this.config.model,
+            '-y',
+            '-p', instructions
         ];
     }
 }

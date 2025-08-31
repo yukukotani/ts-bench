@@ -1,6 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
-import { BaseAgentBuilder } from '../../utils/docker';
+import { BaseAgentBuilder } from '../base';
 
 export class QwenAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     constructor(agentConfig: AgentConfig) {
@@ -8,19 +7,26 @@ export class QwenAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     }
 
     protected getEnvironmentVariables(): Record<string, string> {
-        return {}
+        if (this.config.provider === 'openrouter') {
+            return {
+                OPENAI_BASE_URL: 'https://openrouter.ai/api/v1',
+                OPENAI_API_KEY: process.env.OPENROUTER_API_KEY || '',
+                OPENAI_MODEL: this.config.model
+            };
+        }
+        return {
+            OPENAI_BASE_URL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+            OPENAI_API_KEY: process.env.DASHSCOPE_API_KEY || '',
+            OPENAI_MODEL: this.config.model
+        };
     }
 
-    protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
-        return `qwen -y -m ${this.config.model} -p '${escapeShellArg(instructions)}'`;
-    }
-
-    async buildLocalCommand(_exercisePath: string, instructions: string, _fileList?: import('../types').FileList): Promise<string[]> {
+    protected getCoreArgs(instructions: string): string[] {
         return [
-            "qwen",
-            "--debug",
-            "-y",
-            "-p", escapeShellArg(instructions)
+            'qwen',
+            '-y',
+            '-m', this.config.model,
+            '-p', instructions
         ];
     }
 } 

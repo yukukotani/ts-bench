@@ -7,35 +7,19 @@ describe('ClaudeAgentBuilder', () => {
         containerName: 'test-container'
     };
 
-    it('should build correct command for Claude agent', async () => {
-    const prev = process.env.ANTHROPIC_API_KEY;
-    process.env.ANTHROPIC_API_KEY = 'test-key';
-    const builder = new ClaudeAgentBuilder(config);
-    const args = await builder.build('/path/to/exercise', 'Test instructions');
+    it('buildCommand should return core args and env', async () => {
+        const prev = process.env.ANTHROPIC_API_KEY;
+        process.env.ANTHROPIC_API_KEY = 'test-key';
 
-        expect(args).toContain('docker');
-        expect(args).toContain('run');
-    expect(args).toContain('-e');
-    expect(args.some(a => a.startsWith('ANTHROPIC_API_KEY='))).toBeTrue();
-        expect(args).toContain('test-container');
-        expect(args.join(' ')).toContain('claude-3-sonnet');
+        const builder = new ClaudeAgentBuilder(config);
+        const cmd = await builder.buildCommand('Test instructions');
+
+        expect(cmd.args[0]).toBe('claude');
+        expect(cmd.args).toContain('--model');
+        expect(cmd.args).toContain('claude-3-sonnet');
+        expect(cmd.args).toContain('-p');
+        expect(cmd.env?.ANTHROPIC_API_KEY).toBe('test-key');
+
         process.env.ANTHROPIC_API_KEY = prev;
-    });
-
-    it('should escape shell arguments properly', async () => {
-        const builder = new ClaudeAgentBuilder(config);
-        const instructions = "Test with 'quotes'";
-        const args = await builder.build('/path/to/exercise', instructions);
-        
-        const shellCommand = args[args.length - 1];
-        expect(shellCommand).toContain("'\"'\"'");
-    });
-
-    it('should include workspace volume mount', async () => {
-        const builder = new ClaudeAgentBuilder(config);
-        const args = await builder.build('/test/exercise', 'Instructions');
-        
-        const volumeMount = args.find(arg => arg.includes('/test/exercise:/workspace'));
-        expect(volumeMount).toBeDefined();
     });
 });

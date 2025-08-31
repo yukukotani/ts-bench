@@ -1,7 +1,7 @@
+import type { Command } from '../execution/types';
+
 export interface AgentBuilder {
-    build(exercisePath: string, instructions: string, useDocker?: boolean, fileList?: FileList): Promise<string[]>;
-    buildDockerCommand(exercisePath: string, instructions: string, fileList?: FileList): Promise<string[]>;
-    buildLocalCommand(exercisePath: string, instructions: string, fileList?: FileList): Promise<string[]>;
+    buildCommand(instructions: string, fileList?: FileList): Promise<Command>;
 }
 
 export interface FileList {

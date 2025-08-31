@@ -1,6 +1,5 @@
 import type { AgentBuilder, AgentConfig } from '../types';
-import { escapeShellArg } from '../../utils/shell';
-import { BaseAgentBuilder } from '../../utils/docker';
+import { BaseAgentBuilder } from '../base';
 
 export class OpenCodeAgentBuilder extends BaseAgentBuilder implements AgentBuilder {
     constructor(agentConfig: AgentConfig) {
@@ -25,14 +24,10 @@ export class OpenCodeAgentBuilder extends BaseAgentBuilder implements AgentBuild
         return baseEnv;
     }
 
-    protected getDockerShellCommand(instructions: string, _fileList?: import('../types').FileList): string {
-        return `opencode run -m ${this.config.model} '${escapeShellArg(instructions)}'`;
-    }
-
-    async buildLocalCommand(_exercisePath: string, instructions: string, _fileList?: import('../types').FileList): Promise<string[]> {
+    protected getCoreArgs(instructions: string): string[] {
         return [
-            "opencode", "run",
-            "-m", this.config.model,
+            'opencode', 'run',
+            '-m', this.config.model,
             instructions
         ];
     }
