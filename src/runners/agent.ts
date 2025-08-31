@@ -46,7 +46,7 @@ export class AgentRunner {
                 progressMonitor.start();
             }
 
-            const execOptions = useDocker ? {} : { 
+            const execOptions = useDocker ? {} : {
                 cwd: join(process.cwd(), exercisePath),
                 env: this.getAgentEnvironment(config)
             };
@@ -62,7 +62,7 @@ export class AgentRunner {
                 return { exercise, success: true, duration, output: result.stdout };
             } else {
                 this.logger.logAgentFailure(exercise, duration, config.verbose, result);
-                
+
                 // Agent failed - exit immediately
                 console.error(`❌ Agent failed for ${exercise}. Exiting immediately.`);
                 return { exercise, success: false, duration, error: result.stderr, output: result.stdout };
@@ -75,7 +75,7 @@ export class AgentRunner {
             const duration = Date.now() - startTime;
             const errorMsg = error instanceof Error ? error.message : String(error);
             this.logger.logAgentError(exercise, duration, errorMsg);
-            
+
             // Agent error - exit immediately
             console.error(`❌ Agent error for ${exercise}: ${errorMsg}. Exiting immediately.`);
             return { exercise, success: false, duration, error: errorMsg };
@@ -104,17 +104,19 @@ export class AgentRunner {
             ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
             OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
             GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
-            GEMINI_API_KEY: process.env.GEMINI_API_KEY || ''
-        } as Record<string,string>;
+            GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+            DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY || ''
+        } as Record<string, string>;
 
-        // Inject anthropic base url and auth token for dashscope provider when using claude agent
-        if (config.agent === 'claude' && config.provider === 'dashscope') {
-            baseEnv.ANTHROPIC_AUTH_TOKEN = process.env.DASHSCOPE_API_KEY || baseEnv.ANTHROPIC_API_KEY;
-            baseEnv.ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL || 'https://dashscope-intl.aliyuncs.com/api/v2/apps/claude-code-proxy';
-        }
 
         // Agent-specific environment variables
         switch (config.agent) {
+            case 'claude':
+                if (config.provider === 'dashscope') {
+                    baseEnv.ANTHROPIC_AUTH_TOKEN = process.env.DASHSCOPE_API_KEY || baseEnv.ANTHROPIC_API_KEY;
+                    baseEnv.ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL || 'https://dashscope-intl.aliyuncs.com/api/v2/apps/claude-code-proxy';
+                }
+                return baseEnv;
             case 'goose':
                 return {
                     ...baseEnv,
@@ -144,24 +146,22 @@ export class AgentRunner {
                     GEMINI_API_KEY: process.env.GEMINI_API_KEY || ''
                 };
             case 'qwen':
-                // Use QwenAgentBuilder's environment logic
-                const qwenEnv = {
-                    ...baseEnv,
-                    OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || "",
-                    PROXY: process.env.PROXY || ""
-                };
-                
-                // OpenRouter specific configuration
                 if (config.provider === 'openrouter') {
                     return {
-                        ...qwenEnv,
+                        ...baseEnv,
                         OPENAI_BASE_URL: "https://openrouter.ai/api/v1",
                         OPENAI_API_KEY: process.env.OPENROUTER_API_KEY || "",
                         OPENAI_MODEL: config.model
                     };
+                } else {
+                    return {
+                        OPENAI_BASE_URL: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+                        OPENAI_API_KEY: process.env.DASHSCOPE_API_KEY || "",
+                        OPENAI_MODEL: config.model,
+                        GOOGLE_API_KEY: '',
+                        GEMINI_API_KEY: ''
+                    };
                 }
-                
-                return qwenEnv;
             default:
                 return baseEnv;
         }
