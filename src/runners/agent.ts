@@ -163,6 +163,11 @@ export class AgentRunner {
                         GEMINI_API_KEY: ''
                     };
                 }
+            case 'cursor':
+                return {
+                    ...baseEnv,
+                    CURSOR_API_KEY: process.env.CURSOR_API_KEY || ''
+                };
             default:
                 return baseEnv;
         }
