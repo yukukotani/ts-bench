@@ -93,7 +93,8 @@ async function runTestOnlyMode(
         model: args.model,
         provider: args.provider,
         verbose: args.verbose,
-        useDocker: args.useDocker
+        useDocker: args.useDocker,
+        timeout: args.timeout
     };
 
     let exercises: string[] = [];
