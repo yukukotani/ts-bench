@@ -34,7 +34,7 @@ and [Aider](https://www.aider.com/)
 
 ## 📖 Vision & Principles
 
-This project is strongly inspired by benchmarks like Aider-Polyglot. Rather than measuring the performance of large language models (LLMs) alone, it focuses on evaluating the **agent layer**—the entire AI coding assistant tool, including prompt strategies, file operations, and iterative logic.
+This project is strongly inspired by benchmarks like [Aider Polyglot](https://aider.chat/2024/12/21/polyglot.html). Rather than measuring the performance of large language models (LLMs) alone, it focuses on evaluating the **agent layer**—the entire AI coding assistant tool, including prompt strategies, file operations, and iterative logic.
 
 Based on this vision, the benchmark is designed according to the following principles:
 
