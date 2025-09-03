@@ -39,6 +39,7 @@ export interface BenchmarkConfig {
     version?: string;
     showProgress?: boolean;
     timeout?: number; // seconds
+    outputDir?: string;
 }
 
 export interface CLIArgs {

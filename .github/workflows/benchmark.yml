@@ -58,6 +58,10 @@ on:
         description: Directory to save result JSON
         required: false
         default: ./results
+      output_dir:
+        description: Directory to save general outputs (e.g., logs)
+        required: false
+        default: ./results
       verbose:
         description: Verbose console output
         required: false
@@ -227,7 +231,8 @@ jobs:
           CMD=(bun src/index.ts \
             --agent "${{ github.event.inputs.agent }}" \
             --model "${{ github.event.inputs.model }}" \
-            --provider "${{ github.event.inputs.provider }}")
+            --provider "${{ github.event.inputs.provider }}" \
+            --output-dir "${{ github.event.inputs.output_dir }}")
 
           # Docker toggle
           if [ "${{ github.event.inputs.use_docker }}" = "true" ]; then
@@ -327,6 +332,7 @@ jobs:
           name: benchmark-results
           path: |
             ${{ github.event.inputs.result_dir }}/
+            ${{ github.event.inputs.output_dir }}/${{ github.event.inputs.agent }}/logs/
             benchmark-summary.txt
           if-no-files-found: warn
           retention-days: 14

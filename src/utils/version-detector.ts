@@ -55,37 +55,37 @@ export class VersionDetector {
             case 'claude':
                 // Claude Code output: "claude-code 1.2.3" or "1.2.3"
                 const claudeMatch = cleanOutput.match(/(?:claude-code\s+)?(\d+\.\d+\.\d+)/i);
-                return claudeMatch ? claudeMatch[1] : this.extractGenericVersion(cleanOutput);
+                return claudeMatch && claudeMatch[1] ? claudeMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'aider':
                 // Aider output: "aider 0.45.1" or "0.45.1"
                 const aiderMatch = cleanOutput.match(/(?:aider\s+)?(\d+\.\d+\.\d+)/i);
-                return aiderMatch ? aiderMatch[1] : this.extractGenericVersion(cleanOutput);
+                return aiderMatch && aiderMatch[1] ? aiderMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'goose':
                 // Goose output: "goose 1.2.0" or "1.2.0"
                 const gooseMatch = cleanOutput.match(/(?:goose\s+)?(\d+\.\d+\.\d+)/i);
-                return gooseMatch ? gooseMatch[1] : this.extractGenericVersion(cleanOutput);
+                return gooseMatch && gooseMatch[1] ? gooseMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'codex':
                 // Codex output: "codex 1.0.0" or "1.0.0"
                 const codexMatch = cleanOutput.match(/(?:codex\s+)?(\d+\.\d+\.\d+)/i);
-                return codexMatch ? codexMatch[1] : this.extractGenericVersion(cleanOutput);
+                return codexMatch && codexMatch[1] ? codexMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'gemini':
                 // Gemini output: "gemini 1.0.0" or "1.0.0"
                 const geminiMatch = cleanOutput.match(/(?:gemini\s+)?(\d+\.\d+\.\d+)/i);
-                return geminiMatch ? geminiMatch[1] : this.extractGenericVersion(cleanOutput);
+                return geminiMatch && geminiMatch[1] ? geminiMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'qwen':
                 // Qwen output: "qwen 1.0.0" or "1.0.0"
                 const qwenMatch = cleanOutput.match(/(?:qwen\s+)?(\d+\.\d+\.\d+)/i);
-                return qwenMatch ? qwenMatch[1] : this.extractGenericVersion(cleanOutput);
+                return qwenMatch && qwenMatch[1] ? qwenMatch[1] : this.extractGenericVersion(cleanOutput);
                 
             case 'opencode':
                 // OpenCode output: "opencode 1.0.0" or "1.0.0"
                 const opencodeMatch = cleanOutput.match(/(?:opencode\s+)?(\d+\.\d+\.\d+)/i);
-                return opencodeMatch ? opencodeMatch[1] : this.extractGenericVersion(cleanOutput);
+                return opencodeMatch && opencodeMatch[1] ? opencodeMatch[1] : this.extractGenericVersion(cleanOutput);
             case 'cursor':
                 // Cursor Agent output: generic semver or text containing version
                 return this.extractGenericVersion(cleanOutput);
@@ -98,19 +98,19 @@ export class VersionDetector {
     private extractGenericVersion(output: string): string {
         // Try to extract any semver pattern
         const semverMatch = output.match(/(\d+\.\d+\.\d+)/);
-        if (semverMatch) {
+        if (semverMatch && semverMatch[1]) {
             return semverMatch[1];
         }
         
         // Try to extract x.y pattern and add .0
         const shortVersionMatch = output.match(/(\d+\.\d+)/);
-        if (shortVersionMatch) {
+        if (shortVersionMatch && shortVersionMatch[1]) {
             return `${shortVersionMatch[1]}.0`;
         }
         
         // Last resort: extract just major version and add .0.0
         const majorVersionMatch = output.match(/(\d+)/);
-        if (majorVersionMatch) {
+        if (majorVersionMatch && majorVersionMatch[1]) {
             return `${majorVersionMatch[1]}.0.0`;
         }
         

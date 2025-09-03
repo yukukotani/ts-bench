@@ -51,7 +51,8 @@ export class BenchmarkRunner {
             useDocker: args.useDocker,
             version: agentVersion,
             showProgress: args.showProgress,
-            timeout: args.timeout
+            timeout: args.timeout,
+            outputDir: args.outputDir
         };
 
         for (const exercise of exercises) {

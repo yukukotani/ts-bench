@@ -34,7 +34,7 @@ export class ConsoleLogger implements Logger {
         return command.length > 1024 ? command.slice(0, 1024) + "..." : command;
     }
     
-    private redact(text: string): string {
+    public redact(text: string): string {
         if (!text) return text;
         let out = text;
         out = out.replace(/Bearer\s+[A-Za-z0-9._-]+/g, 'Bearer ***');

@@ -1,5 +1,6 @@
 import type { AgentResult, BenchmarkConfig } from '../config/types';
 import { AgentFactory } from '../agents/factory';
+import { AgentLoggerFactory } from '../utils/agent-logger';
 import { ExerciseReader } from '../exercises/reader';
 import type { CommandExecutor } from '../utils/shell';
 import type { Logger } from '../utils/logger';
@@ -52,6 +53,10 @@ export class AgentRunner {
 
             const execOptions = { ...prepared.options, timeout: config.timeout };
             const result = await this.executor.execute(prepared.command, execOptions);
+
+            const logCollector = AgentLoggerFactory.create(config.agent);
+            await logCollector.collect(config, exercise, exercisePath, result);
+
             const duration = Date.now() - startTime;
 
             if (progressMonitor) {

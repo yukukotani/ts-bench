@@ -108,10 +108,10 @@ function validateResult(r: SavedBenchmarkResult) {
 }
 
 function buildTopTable(data: LeaderboardData, topN: number): string {
-  const records = Object.values(data.results);
+  const records = Object.values(data.results).filter(Boolean);
   const sorted = records
     .slice()
-    .sort((a, b) => {
+    .sort((a: SavedBenchmarkResult, b: SavedBenchmarkResult) => {
       if (b.summary.successRate !== a.summary.successRate) {
         return b.summary.successRate - a.summary.successRate;
       }
@@ -123,6 +123,9 @@ function buildTopTable(data: LeaderboardData, topN: number): string {
   const separator = '|:----:|:------|:------|:--------------:|:------:|:----------:|:-----:|';
 
   const rows = sorted.map((r, i) => {
+    if (!r || !r.metadata || !r.summary) {
+      return '';
+    }
     const rank = i + 1;
     const agent = r.metadata.agent;
     const model = r.metadata.model;
@@ -136,26 +139,28 @@ function buildTopTable(data: LeaderboardData, topN: number): string {
       label = `#${runId.slice(-6)}`;
     } else if (runUrl) {
       const m = runUrl.match(/runs\/(\d+)/);
-      if (m) label = `#${m[1].slice(-6)}`;
+      if (m && m[1]) label = `#${m[1].slice(-6)}`;
     }
     const resultCell = runUrl ? `[${label}](${runUrl})` : '-';
     return `| ${rank} | ${agent} | ${model} | **${successRate}** | ${solved} | ${avgTime} | ${resultCell} |`;
-  });
+  }).filter(Boolean);
 
   return [header, separator, ...rows].join('\n');
 }
 
 function getRankedList(data: LeaderboardData) {
-  return Object.entries(data.results)
-    .map(([k, r]) => ({ key: k, ...r }))
-    .sort((a: any, b: any) => {
+  type RankedResult = SavedBenchmarkResult & { key: string };
+  const records: RankedResult[] = Object.entries(data.results).map(([key, r]) => ({ key, ...r }));
+
+  return records
+    .sort((a, b) => {
       if (b.summary.successRate !== a.summary.successRate) {
         return b.summary.successRate - a.summary.successRate;
       }
       return a.summary.avgDuration - b.summary.avgDuration;
     })
     .map((r, i) => ({
-      key: r.key as string,
+      key: r.key,
       rank: i + 1,
       metadata: r.metadata,
       summary: r.summary,
