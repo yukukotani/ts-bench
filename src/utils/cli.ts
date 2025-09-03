@@ -69,17 +69,17 @@ Help:
 export async function parseCommandLineArgs(): Promise<CLIArgs> {
     const modelIndex = process.argv.indexOf('--model');
     const model = modelIndex !== -1 && modelIndex + 1 < process.argv.length
-        ? process.argv[modelIndex + 1]
+        ? process.argv[modelIndex + 1]!
         : 'sonnet';
 
     const agentIndex = process.argv.indexOf('--agent');
     const agent = (agentIndex !== -1 && agentIndex + 1 < process.argv.length
-        ? process.argv[agentIndex + 1]
+        ? process.argv[agentIndex + 1]!
         : 'claude') as AgentType;
 
     const providerIndex = process.argv.indexOf('--provider');
     const provider = (providerIndex !== -1 && providerIndex + 1 < process.argv.length
-        ? process.argv[providerIndex + 1]
+        ? process.argv[providerIndex + 1]!
         : 'openai') as ProviderType;
 
     const verbose = process.argv.includes('--verbose');
@@ -88,12 +88,12 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
     // New output options
     const outputFormatIndex = process.argv.indexOf('--output-format');
     const outputFormat = outputFormatIndex !== -1 && outputFormatIndex + 1 < process.argv.length
-        ? process.argv[outputFormatIndex + 1] as 'console' | 'json'
+        ? process.argv[outputFormatIndex + 1]! as 'console' | 'json'
         : 'console';
 
     const outputDirIndex = process.argv.indexOf('--output-dir');
     const outputDir = outputDirIndex !== -1 && outputDirIndex + 1 < process.argv.length
-        ? process.argv[outputDirIndex + 1]
+        ? process.argv[outputDirIndex + 1]!
         : undefined;
 
     const exportWeb = process.argv.includes('--export-web');
@@ -102,17 +102,17 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
     // Batch execution options
     const batchIndex = process.argv.indexOf('--batch');
     const batch = batchIndex !== -1 && batchIndex + 1 < process.argv.length
-        ? parseInt(process.argv[batchIndex + 1], 10)
+        ? parseInt(process.argv[batchIndex + 1]!, 10)
         : undefined;
 
     const totalBatchesIndex = process.argv.indexOf('--total-batches');
     const totalBatches = totalBatchesIndex !== -1 && totalBatchesIndex + 1 < process.argv.length
-        ? parseInt(process.argv[totalBatchesIndex + 1], 10)
+        ? parseInt(process.argv[totalBatchesIndex + 1]!, 10)
         : 5;
 
     const exercismPathIndex = process.argv.indexOf('--exercism-path');
     const exercismPath = exercismPathIndex !== -1 && exercismPathIndex + 1 < process.argv.length
-        ? process.argv[exercismPathIndex + 1]
+        ? process.argv[exercismPathIndex + 1]!
         : undefined;
 
     const useDocker = process.argv.includes('--docker');
@@ -123,7 +123,7 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
     // Timeout option (seconds), default 300
     const timeoutIndex = process.argv.indexOf('--timeout');
     const timeout = timeoutIndex !== -1 && timeoutIndex + 1 < process.argv.length
-        ? parseInt(process.argv[timeoutIndex + 1], 10)
+        ? parseInt(process.argv[timeoutIndex + 1]!, 10)
         : 300;
 
     // Result saving options
@@ -131,12 +131,12 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
     
     const resultNameIndex = process.argv.indexOf('--result-name');
     const resultName = resultNameIndex !== -1 && resultNameIndex + 1 < process.argv.length
-        ? process.argv[resultNameIndex + 1]
+        ? process.argv[resultNameIndex + 1]!
         : undefined;
     
     const resultDirIndex = process.argv.indexOf('--result-dir');
     const resultDir = resultDirIndex !== -1 && resultDirIndex + 1 < process.argv.length
-        ? process.argv[resultDirIndex + 1]
+        ? process.argv[resultDirIndex + 1]!
         : undefined;
 
     const generateLeaderboard = process.argv.includes('--generate-leaderboard');
@@ -144,17 +144,17 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
 
     const versionIndex = process.argv.indexOf('--version');
     const version = versionIndex !== -1 && versionIndex + 1 < process.argv.length
-        ? process.argv[versionIndex + 1]
+        ? process.argv[versionIndex + 1]!
         : undefined;
 
     const customInstructionIndex = process.argv.indexOf('--custom-instruction');
     const customInstruction = customInstructionIndex !== -1 && customInstructionIndex + 1 < process.argv.length
-        ? process.argv[customInstructionIndex + 1]
+        ? process.argv[customInstructionIndex + 1]!
         : undefined;
 
     const exerciseIndex = process.argv.indexOf('--exercise');
     let specificExercise = exerciseIndex !== -1 && exerciseIndex + 1 < process.argv.length
-        ? process.argv[exerciseIndex + 1]
+        ? process.argv[exerciseIndex + 1]!
         : null;
 
     let exerciseCount: number | null = null;
@@ -175,16 +175,16 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
             // Comma-separated case: specify multiple exercises
             exerciseList = specificExercise.split(',').map(ex => {
                 const trimmed = ex.trim();
-                return trimmed.includes('/') ? trimmed.split('/').pop() || trimmed : trimmed;
+                return trimmed.includes('/') ? trimmed.split('/').pop()! || trimmed : trimmed;
             }).filter(ex => ex.length > 0);
             specificExercise = null;
         } else if (specificExercise.includes('/')) {
             // Path format case: extract exercise name
-            specificExercise = specificExercise.split('/').pop() || null;
+            specificExercise = specificExercise.split('/').pop()! || null;
         }
     }
 
-    return {
+    const result: CLIArgs = {
         model,
         agent,
         provider,
@@ -213,4 +213,5 @@ export async function parseCommandLineArgs(): Promise<CLIArgs> {
         customInstruction,
         timeout
     };
+    return result;
 }

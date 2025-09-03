@@ -169,13 +169,13 @@ export class LeaderboardGenerator {
             const avgExecutionTime = Number((result.summary.avgDuration / 60000).toFixed(2));
             const totalExecutionTime = Number((avgExecutionTime * result.summary.successCount).toFixed(2));
 
-            let version = result.metadata.version;
-            if (!version) {
+            let version: string = result.metadata.version || 'unknown';
+            if (!result.metadata.version) {
                 const agentKey = result.metadata.agent.toLowerCase();
                 if (versionCache.has(agentKey)) {
                     version = versionCache.get(agentKey)!;
                 } else {
-                    version = await this.extractVersion(agentKey as AgentType, detector);
+                    version = await this.extractVersion(agentKey as AgentType, detector) || 'unknown';
                     versionCache.set(agentKey, version);
                 }
             }
@@ -192,7 +192,7 @@ export class LeaderboardGenerator {
                 problemsSolved: result.summary.successCount,
                 totalProblems: result.summary.totalCount,
                 rank: 0, // Will be set after sorting
-                lastUpdated: result.metadata.timestamp.split('T')[0] // Extract date (YYYY-MM-DD)
+                lastUpdated: (result.metadata.timestamp?.split('T')[0] ?? new Date().toISOString().split('T')[0]) as string
             });
         }
         
@@ -245,7 +245,7 @@ export class LeaderboardGenerator {
         return {
             metadata: {
                 timestamp: new Date().toISOString(),
-                totalExercises: results.length > 0 ? results[0].summary.totalCount : 0,
+                totalExercises: results.length > 0 ? results[0]!.summary.totalCount : 0,
                 benchmarkVersion: "1.0.0",
                 generatedBy: "ts-bench"
             },

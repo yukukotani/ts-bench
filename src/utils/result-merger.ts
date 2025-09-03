@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 
 export interface BenchmarkResult {
   exercise: string;
@@ -81,7 +80,7 @@ export class ResultMerger {
   saveResults(data: BenchmarkData): void {
     const dir = this.dataPath.split('/').slice(0, -1).join('/');
     if (!existsSync(dir)) {
-      require('fs').mkdirSync(dir, { recursive: true });
+      mkdirSync(dir, { recursive: true });
     }
     
     writeFileSync(this.dataPath, JSON.stringify(data, null, 2));
@@ -111,18 +110,22 @@ export class ResultMerger {
 
     results.forEach(result => {
       // Aggregate by agent
-      if (!byAgent[result.agent]) {
-        byAgent[result.agent] = { total: 0, success: 0 };
+      const agentSummary = byAgent[result.agent];
+      if (agentSummary) {
+        agentSummary.total++;
+        if (result.success) agentSummary.success++;
+      } else {
+        byAgent[result.agent] = { total: 1, success: result.success ? 1 : 0 };
       }
-      byAgent[result.agent].total++;
-      if (result.success) byAgent[result.agent].success++;
 
       // Aggregate by exercise
-      if (!byExercise[result.exercise]) {
-        byExercise[result.exercise] = { total: 0, success: 0 };
+      const exerciseSummary = byExercise[result.exercise];
+      if (exerciseSummary) {
+        exerciseSummary.total++;
+        if (result.success) exerciseSummary.success++;
+      } else {
+        byExercise[result.exercise] = { total: 1, success: result.success ? 1 : 0 };
       }
-      byExercise[result.exercise].total++;
-      if (result.success) byExercise[result.exercise].success++;
     });
 
     return { byAgent, byExercise };
