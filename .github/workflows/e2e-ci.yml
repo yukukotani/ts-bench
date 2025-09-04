@@ -1,0 +1,33 @@
+name: E2E CI Test
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Install agent CLI (local mode)
+        run: |
+          set -euo pipefail
+          agent="codex"
+          echo "Installing CLI for agent: $agent"
+          npm install -g @openai/codex
+      - name: Run single benchmark test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          bun src/index.ts \
+            --agent codex \
+            --model gpt-5-nano \
+            --provider openai \
+            --exercise hello-world \
+            --verbose

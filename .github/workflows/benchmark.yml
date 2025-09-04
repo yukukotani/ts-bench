@@ -112,7 +112,6 @@ jobs:
               ;;
             codex)
               npm install -g @openai/codex
-              echo "CODEX_RUST=1" >> "$GITHUB_ENV"
               # Provide default AGENTS.md (optional)
               echo "Solve this TypeScript exercise. Read the test file to understand requirements and implement the solution." > AGENTS.md
               ;;
