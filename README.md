@@ -29,8 +29,7 @@ Currently supported agents:
 * [OpenCode](https://opencode.ai/)
 * [Goose CLI](https://block.github.io/goose/)
 * [Qwen Code](https://qwenlm.github.io/qwen-code-docs/)
-
-and [Aider](https://www.aider.com/)
+* [Aider](https://aider.chat/)
 
 ## 📖 Vision & Principles
 
