@@ -22,7 +22,7 @@ on:
         required: true
         default: claude-3-5-haiku-20241022
       provider:
-        description: Provider (openai, groq, cerebras, anthropic, google, openrouter, dashscope, xai, deepseek)
+        description: Provider (openai, anthropic, google, openrouter, etc.)
         required: true
         default: anthropic
         type: choice
@@ -36,6 +36,8 @@ on:
           - dashscope
           - xai
           - deepseek
+          - moonshot
+          - zai
       use_docker:
         description: Run agent in Docker
         required: false
@@ -223,6 +225,8 @@ jobs:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           CUSTOM_INSTRUCTION: ${{ github.event.inputs.custom_instruction }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
         run: |
           set -euo pipefail
           mkdir -p "${{ github.event.inputs.result_dir }}"
