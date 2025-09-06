@@ -333,6 +333,23 @@ jobs:
         run: |
           echo "Opencode log:"
           ls -la /home/runner/.local/share/opencode/log/
+      # Opencodeのログファイル（.log）の中身をすべて出力する
+      - name: Print Opencode .log file contents
+        if: ${{ github.event.inputs.agent == 'opencode' }}
+        run: |
+          LOG_DIR="/home/runner/.local/share/opencode/log/"
+          echo "Opencode .logファイルの内容:"
+          if [ -d "$LOG_DIR" ]; then
+            for f in "$LOG_DIR"/*.log; do
+              if [ -f "$f" ]; then
+                echo "----- $f -----"
+                cat "$f"
+                echo
+              fi
+            done
+          else
+            echo "ログディレクトリが存在しません: $LOG_DIR"
+          fi
 
       - name: Upload artifacts (results + console)
         if: always()
