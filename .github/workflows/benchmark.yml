@@ -49,7 +49,7 @@ on:
       save_result:
         description: Save result JSON
         required: false
-        default: false
+        default: true
         type: boolean
       result_dir:
         description: Directory to save result JSON
