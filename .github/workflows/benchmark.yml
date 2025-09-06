@@ -51,6 +51,19 @@ on:
         required: false
         default: false
         type: boolean
+      result_dir:
+        description: Directory to save result JSON
+        required: false
+        default: ./results
+      output_dir:
+        description: Directory to save general outputs (e.g., logs)
+        required: false
+        default: ./results
+      use_docker:
+        description: Run agent in Docker
+        required: false
+        default: false
+        type: boolean
       verbose:
         description: Verbose console output
         required: false
