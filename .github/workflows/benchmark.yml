@@ -69,11 +69,6 @@ on:
         required: false
         default: false
         type: boolean
-      push_results:
-        description: 'If set to true, all solutions (successful and failed) will be pushed to a new branch in the exercism-typescript repository'
-        required: false
-        default: false
-        type: boolean
 
 run-name: 'Benchmark for ${{ github.event.inputs.agent }} using ${{ github.event.inputs.model }}'
 
