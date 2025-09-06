@@ -17,10 +17,6 @@ on:
           - qwen
           - aider
           - cursor
-      model:
-        description: Model to use (e.g., claude-sonnet-4-20250514)
-        required: true
-        default: claude-3-5-haiku-20241022
       provider:
         description: Provider (openai, anthropic, google, openrouter, etc.)
         required: true
@@ -38,11 +34,10 @@ on:
           - deepseek
           - moonshot
           - zai
-      use_docker:
-        description: Run agent in Docker
-        required: false
-        default: false
-        type: boolean
+      model:
+        description: Model to use (e.g., claude-sonnet-4-20250514)
+        required: true
+        default: claude-3-5-haiku-20241022
       exercise:
         description: "Exercise selection: number (first N), comma list, or name"
         required: false
@@ -54,20 +49,12 @@ on:
       save_result:
         description: Save result JSON
         required: false
-        default: true
+        default: false
         type: boolean
-      result_dir:
-        description: Directory to save result JSON
-        required: false
-        default: ./results
-      output_dir:
-        description: Directory to save general outputs (e.g., logs)
-        required: false
-        default: ./results
       verbose:
         description: Verbose console output
         required: false
-        default: true
+        default: false
         type: boolean
       push_results:
         description: 'If set to true, all solutions (successful and failed) will be pushed to a new branch in the exercism-typescript repository'
