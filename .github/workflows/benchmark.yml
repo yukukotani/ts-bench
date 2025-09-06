@@ -337,6 +337,6 @@ jobs:
             ${{ github.event.inputs.result_dir }}/
             ${{ github.event.inputs.output_dir }}/${{ github.event.inputs.agent }}/logs/
             benchmark-summary.txt
-            ~/.local/share/opencode/log/
+            /home/runner/.local/share/opencode/log/
           if-no-files-found: warn
           retention-days: 14
