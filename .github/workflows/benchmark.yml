@@ -328,6 +328,12 @@ jobs:
             echo "- README: [README.md](https://github.com/laiso/ts-bench/)"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Print Opencode log
+        if: ${{ github.event.inputs.agent == 'opencode' }}
+        run: |
+          echo "Opencode log:"
+          ls -la /home/runner/.local/share/opencode/log/
+
       - name: Upload artifacts (results + console)
         if: always()
         uses: actions/upload-artifact@v4
