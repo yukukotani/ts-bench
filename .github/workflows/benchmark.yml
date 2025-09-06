@@ -70,7 +70,7 @@ on:
         default: false
         type: boolean
 
-run-name: 'Benchmark for ${{ github.event.inputs.agent }} using ${{ github.event.inputs.model }}'
+run-name: "Benchmark for ${{ github.event.inputs.agent }} using ${{ github.event.inputs.model }}"
 
 jobs:
   run-benchmark:
@@ -79,7 +79,7 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 120
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -157,17 +157,17 @@ jobs:
           name = "OpenAI"
           base_url = "https://api.openai.com/v1"
           env_key = "OPENAI_API_KEY"
-          
+
           [model_providers.cerebras]
           name = "Cerebras"
           base_url = "https://api.cerebras.ai/v1"
           env_key = "CEREBRAS_API_KEY"
-          
+
           [model_providers.groq]
           name = "Groq"
           base_url = "https://api.groq.com/openai/v1"
           env_key = "GROQ_API_KEY"
-          
+
           [model_providers.openrouter]
           name = "OpenRouter"
           base_url = "https://openrouter.ai/api/v1"
@@ -337,5 +337,6 @@ jobs:
             ${{ github.event.inputs.result_dir }}/
             ${{ github.event.inputs.output_dir }}/${{ github.event.inputs.agent }}/logs/
             benchmark-summary.txt
+            ~/.local/share/opencode/log/
           if-no-files-found: warn
           retention-days: 14
